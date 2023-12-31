@@ -9,7 +9,7 @@ const Create = ({ colors, setColors }) => {
     status: "created" //can also be of the 4 given selections
   });
 
-  console.log(color);
+  //console.log(color);
 
   const handleSubmit = (e) => {
     e.preventDefault();
