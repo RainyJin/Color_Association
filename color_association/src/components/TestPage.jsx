@@ -1,25 +1,59 @@
 import { useState, useEffect } from "react";
 import Calendar from "../assets/Calendar.svg";
+const months = [
+  { name: "Jan", days: 31 },
+  { name: "Feb", days: 28 },
+  { name: "Mar", days: 31 },
+  { name: "Apr", days: 30 },
+  { name: "May", days: 31 },
+  { name: "Jun", days: 30 },
+  { name: "Jul", days: 31 },
+  { name: "Aug", days: 31 },
+  { name: "Sep", days: 30 },
+  { name: "Oct", days: 31 },
+  { name: "Nov", days: 30 },
+  { name: "Dec", days: 31 },
+];
 
 export default function TestPage() {
+  const [currentMonthIndex, setCurrentMonthIndex] = useState(8); // 8 for September
+  const [currentDay, setCurrentDay] = useState(1);
+
   const [showRedLine, setShowRedLine] = useState(false);
   const [showYellowLine, setShowYellowLine] = useState(false);
+
+  const handleAdvanceDay = () => {
+    setCurrentDay((prevDay) => {
+      const monthDays = months[currentMonthIndex].days;
+      if (prevDay < monthDays) {
+        return prevDay + 1;
+      } else {
+        // If we're at the last day of the month, reset to day 1
+        setCurrentMonthIndex((prevMonthIndex) =>
+          prevMonthIndex < 11 ? prevMonthIndex + 1 : 0
+        );
+        return 1;
+      }
+    });
+  };
 
   // Handle key press
   useEffect(() => {
     const handleKeyPress = (event) => {
       if (event.key === "a" || event.key === "A") {
-        setShowRedLine(true); // Show red line on 'A' press
-        setShowYellowLine(false); // Hide yellow line if it was shown
+        setShowRedLine(true);
+        setShowYellowLine(false);
         setTimeout(() => {
+          handleAdvanceDay();
           setShowRedLine(false);
-        }, 1000);
+        }, 400);
       } else if (event.key === "d" || event.key === "D") {
-        setShowYellowLine(true); // Show yellow line on 'D' press
-        setShowRedLine(false); // Hide red line if it was shown
+        setShowYellowLine(true);
+        setShowRedLine(false);
         setTimeout(() => {
+          handleAdvanceDay();
           setShowYellowLine(false);
-        }, 1000);
+        }, 400);
       }
     };
 
@@ -47,10 +81,10 @@ export default function TestPage() {
           className="relative"
         />
         <p className="absolute text-white text-5xl font-bold top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-28 z-10">
-          Sep
+          {months[currentMonthIndex].name}
         </p>
         <p className="absolute text-black text-8xl font-bold top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-2 z-10">
-          1
+          {currentDay}
         </p>
 
         {/* Red line (only visible when 'A' is pressed) */}
