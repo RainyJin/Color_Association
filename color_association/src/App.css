@@ -1,1 +1,12 @@
+@keyframes scroll-line {
+  from {
+    width: 0;
+  }
+  to {
+    width: 30%;
+  }
+}
 
+.animate-scroll-line {
+  animation: scroll-line 0.5s ease-out forwards;
+}
