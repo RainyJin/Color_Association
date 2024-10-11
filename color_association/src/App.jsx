@@ -9,19 +9,31 @@ function App() {
   const twoColors = ["#990000", "#FFDF00"];
   const threeColors = ["#990000", "#FFDF00", "#0096FF"];
   const twoConcepts = ["apple", "banana"];
-  const threeconcepts = ["apple", "banana", "blueberry"];
+  const threeConcepts = ["apple", "banana", "blueberry"];
 
   return (
     <div>
       <Routes>
         <Route path="/" element={<InstructionPage />} />
         <Route
-          path="/instructions"
-          element={<StartPage colors={threeColors} texts={threeconcepts} />}
+          path="/instructionsTwoColors"
+          element={<StartPage colors={twoColors} texts={twoConcepts} />}
         />
         <Route
-          path="/trial"
-          element={<TestPage colors={threeColors} texts={threeconcepts} />}
+          path="/trialsTwoColors"
+          element={
+            <TestPage colors={twoColors} texts={twoConcepts} numDays={10} />
+          }
+        />
+        <Route
+          path="/instructionsThreeColors"
+          element={<StartPage colors={threeColors} texts={threeConcepts} />}
+        />
+        <Route
+          path="/trialsThreeColors"
+          element={
+            <TestPage colors={threeColors} texts={threeConcepts} numDays={20} />
+          }
         />
       </Routes>
     </div>

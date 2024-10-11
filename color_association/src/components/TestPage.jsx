@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Calendar from "../assets/Calendar.svg";
 import twoKeys from "../assets/2keys.svg";
 
@@ -25,10 +26,13 @@ const shuffleArray = (array) => {
   return array;
 };
 
-export default function TestPage({ colors, texts }) {
+export default function TestPage({ colors, texts, numDays }) {
   const [currentMonthIndex, setCurrentMonthIndex] = useState(8); // 8 for September
   const [currentDay, setCurrentDay] = useState(1);
   const [currentItem, setCurrentItem] = useState("");
+
+  const [totalDays, setTotalDays] = useState(0);
+  const navigate = useNavigate();
 
   const [showRedLine, setShowRedLine] = useState(false);
   const [showYellowLine, setShowYellowLine] = useState(false);
@@ -49,7 +53,21 @@ export default function TestPage({ colors, texts }) {
         return 1;
       }
     });
+
+    setTotalDays((prevDays) => prevDays + 1);
   };
+
+  useEffect(() => {
+    if (totalDays >= numDays) {
+      if (colors.length === 2) {
+        // After 2-color trial, go to start page for 3-color trial
+        navigate("/instructionsThreeColors");
+      } else {
+        // Go to last page
+        navigate("/");
+      }
+    }
+  }, [totalDays, numDays, colors.length, navigate]);
 
   // Randomize text and colors whenever the day changes
   useEffect(() => {
@@ -69,7 +87,7 @@ export default function TestPage({ colors, texts }) {
         setTimeout(() => {
           handleAdvanceDay();
           setShowRedLine(false);
-        }, 400);
+        }, 1000);
       } else if (event.key === "d" || event.key === "D") {
         setShowYellowLine(true);
         setShowRedLine(false);
@@ -77,7 +95,7 @@ export default function TestPage({ colors, texts }) {
         setTimeout(() => {
           handleAdvanceDay();
           setShowYellowLine(false);
-        }, 400);
+        }, 1000);
       } else if (event.key === "s" || event.key === "S") {
         // New case for 'S' key
         if (colors.length === 3) {
@@ -88,7 +106,7 @@ export default function TestPage({ colors, texts }) {
           setTimeout(() => {
             handleAdvanceDay();
             setShowBlueLine(false);
-          }, 400);
+          }, 1000);
         }
       }
     };
@@ -103,16 +121,19 @@ export default function TestPage({ colors, texts }) {
   }, [shuffledColors.length]);
 
   return (
-    <div className="flex flex-row h-screen">
+    <div
+      className="flex flex-row h-screen"
+      style={{ backgroundColor: "#aeaeaf" }}
+    >
       <div className="basis-1/2 flex items-center justify-center text-7xl grid grid-rows-2">
         <p className="text-center mb-[-200px]">
-          Day {currentDay} Buy <br /> <strong>{currentItem}</strong>
+          Buy <br className="mb-[30px]" /> <strong>{currentItem}</strong>
         </p>
         <div className="flex items-center justify-center relative mt-[-80px]">
           <img
             src={twoKeys}
             alt="2Key Keyboard"
-            style={{ width: "60%", height: "60%" }}
+            style={{ width: "60%", height: "60%", opacity: 0 }}
             className="relative"
           />
           {shuffledColors.map((color, index) => {
@@ -143,9 +164,9 @@ export default function TestPage({ colors, texts }) {
           src={Calendar}
           alt="Calendar"
           style={{ width: "60%", height: "60%" }}
-          className="relative"
+          className="relative transform translate-x-1"
         />
-        <p className="absolute text-white text-5xl font-bold top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-28 z-10">
+        <p className="absolute text-black text-5xl font-bold top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-28 z-10">
           {months[currentMonthIndex].name}
         </p>
         <p className="absolute text-black text-8xl font-bold top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-2 z-10">
@@ -155,17 +176,23 @@ export default function TestPage({ colors, texts }) {
         {/* Red line (only visible when 'A' is pressed) */}
         {showRedLine && (
           <div
-            className="absolute left-1/2 transform -translate-x-1/2 top-[65%] w-1/2 h-4 bg-red-500 rounded-full animate-scroll-line"
-            style={{ backgroundColor: shuffledColors[0] }}
+            className="absolute left-1/2 transform -translate-x-1/2 top-[46%]"
+            style={{
+              backgroundColor: shuffledColors[0],
+              width: "360px",
+              height: "220px",
+            }}
           ></div>
         )}
 
         {/* Yellow line (only visible when 'D' is pressed and colors.length is 3) */}
         {showYellowLine && colors.length >= 2 && (
           <div
-            className="absolute left-1/2 transform -translate-x-1/2 top-[65%] w-1/2 h-4 rounded-full animate-scroll-line"
+            className="absolute left-1/2 transform -translate-x-1/2 top-[46%]"
             style={{
               backgroundColor: shuffledColors[shuffledColors.length - 1],
+              width: "360px",
+              height: "220px",
             }}
           ></div>
         )}
@@ -173,8 +200,12 @@ export default function TestPage({ colors, texts }) {
         {/* Blue line (only visible when 'S' is pressed and colors.length is 3) */}
         {showBlueLine && colors.length === 3 && (
           <div
-            className="absolute left-1/2 transform -translate-x-1/2 top-[65%] w-1/2 h-4 rounded-full animate-scroll-line"
-            style={{ backgroundColor: shuffledColors[1] }} // Use colors[2] for blue line
+            className="absolute left-1/2 transform -translate-x-1/2 top-[46%]"
+            style={{
+              backgroundColor: shuffledColors[1],
+              width: "360px",
+              height: "220px",
+            }} // Use colors[2] for blue line
           ></div>
         )}
       </div>
