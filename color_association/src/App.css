@@ -1,12 +1,21 @@
-@keyframes scroll-line {
+@keyframes progress {
   from {
-    width: 0;
+    width: 0%;
   }
   to {
-    width: 30%;
+    width: 94%;
   }
 }
 
 .animate-scroll-line {
-  animation: scroll-line 0.5s ease-out forwards;
+  animation: progress 0.3s ease-in-out forwards;
+}
+
+.slide-to-calendar {
+  transition: transform 0.4s ease-in-out;
+  transform: translateX(800px); /* Adjust to match the direction and distance */
+}
+
+.blank-screen {
+  transition: opacity 0.5s ease-in-out;
 }

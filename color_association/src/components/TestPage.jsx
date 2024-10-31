@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Calendar from "../assets/Calendar.svg";
+import Calendar2 from "../assets/Calendar (1).svg";
 import twoKeys from "../assets/2keys.svg";
 
 const months = [
@@ -30,7 +31,6 @@ export default function TestPage({ colors, texts, numDays }) {
   const [currentMonthIndex, setCurrentMonthIndex] = useState(8); // 8 for September
   const [currentDay, setCurrentDay] = useState(1);
   const [currentItem, setCurrentItem] = useState("");
-
   const [totalDays, setTotalDays] = useState(0);
   const navigate = useNavigate();
 
@@ -39,6 +39,8 @@ export default function TestPage({ colors, texts, numDays }) {
   const [showBlueLine, setShowBlueLine] = useState(false);
 
   const [shuffledColors, setShuffledColors] = useState([]);
+  const [isSliding, setIsSliding] = useState(false); // Track sliding state
+  const [showBlankScreen, setShowBlankScreen] = useState(false); // Track blank screen visibility
 
   const handleAdvanceDay = () => {
     setCurrentDay((prevDay) => {
@@ -62,6 +64,9 @@ export default function TestPage({ colors, texts, numDays }) {
       if (colors.length === 2) {
         // After 2-color trial, go to start page for 3-color trial
         navigate("/instructionsThreeColors");
+      } else if (colors.length === 3) {
+        // After 3-color trial, go to the end page
+        navigate("/endpage");
       } else {
         // Go to last page
         navigate("/");
@@ -77,37 +82,61 @@ export default function TestPage({ colors, texts, numDays }) {
     setShuffledColors(shuffleArray([...colors]));
   }, [currentDay, texts, colors]);
 
-  // Handle key press
   useEffect(() => {
     const handleKeyPress = (event) => {
+      if (isSliding) return; // Prevent triggering animation during a slide
+
+      let selectedIndex = null;
+      let color = "";
+
       if (event.key === "a" || event.key === "A") {
+        selectedIndex = 0;
+        color = shuffledColors[0];
         setShowRedLine(true);
         setShowYellowLine(false);
-        setShowBlueLine(false); // Hide blue line
-        setTimeout(() => {
-          handleAdvanceDay();
-          setShowRedLine(false);
-        }, 1000);
+        setShowBlueLine(false);
       } else if (event.key === "d" || event.key === "D") {
-        setShowYellowLine(true);
+        selectedIndex = colors.length === 2 ? 1 : 2; // Set the index based on color count
+        color = shuffledColors[selectedIndex];
+        setShowYellowLine(colors.length === 2);
+        setShowBlueLine(colors.length === 3);
         setShowRedLine(false);
-        setShowBlueLine(false); // Hide blue line
-        setTimeout(() => {
-          handleAdvanceDay();
-          setShowYellowLine(false);
-        }, 1000);
       } else if (event.key === "s" || event.key === "S") {
-        // New case for 'S' key
         if (colors.length === 3) {
-          // Only show blue line if there are 3 colors
-          setShowBlueLine(true);
+          selectedIndex = 1;
+          color = shuffledColors[selectedIndex];
+          setShowYellowLine(true);
           setShowRedLine(false);
-          setShowYellowLine(false);
-          setTimeout(() => {
-            handleAdvanceDay();
-            setShowBlueLine(false);
-          }, 1000);
+          setShowBlueLine(false);
         }
+      }
+
+      if (selectedIndex !== null) {
+        // Trigger the sliding animation
+        setIsSliding(true);
+        const element = document.getElementById(
+          `color-square-${selectedIndex}`
+        );
+        element.classList.add("slide-to-calendar");
+
+        // Wait for the animation to finish, then show the line
+        setTimeout(() => {
+          // Remove the sliding class to return the square to its original spot
+          setTimeout(() => {
+            element.classList.remove("slide-to-calendar");
+            setIsSliding(false); // Allow new sliding after reset
+
+            // Show blank screen, advance to the next day after delay, and hide it
+            setShowBlankScreen(true); // Show blank screen
+            setTimeout(() => {
+              handleAdvanceDay();
+              setShowRedLine(false);
+              setShowYellowLine(false);
+              setShowBlueLine(false);
+              setShowBlankScreen(false); // Hide blank screen
+            }, 100); // Wait for 100ms
+          }, 1000); // Wait for slide back to original spot
+        }, 1000); // Wait for slide animation (1000ms)
       }
     };
 
@@ -118,13 +147,20 @@ export default function TestPage({ colors, texts, numDays }) {
     return () => {
       window.removeEventListener("keydown", handleKeyPress);
     };
-  }, [shuffledColors.length]);
+  }, [shuffledColors.length, isSliding]);
 
   return (
     <div
       className="flex flex-row h-screen"
-      style={{ backgroundColor: "#aeaeaf" }}
+      style={{ backgroundColor: "#595959" }}
     >
+      {/* Blank screen overlay */}
+      {showBlankScreen && (
+        <div
+          className="absolute top-0 left-0 w-full h-full"
+          style={{ backgroundColor: "#595959", zIndex: 50 }} // Use the same background color
+        />
+      )}
       <div className="basis-1/2 flex items-center justify-center text-7xl grid grid-rows-2">
         <p className="text-center mb-[-200px]">
           Buy <br className="mb-[30px]" /> <strong>{currentItem}</strong>
@@ -151,6 +187,7 @@ export default function TestPage({ colors, texts, numDays }) {
 
             return (
               <div
+                id={`color-square-${index}`}
                 key={index}
                 className={`absolute ${positionClass} w-24 h-24`}
                 style={{ backgroundColor: color, borderRadius: "0.5rem" }}
@@ -160,12 +197,7 @@ export default function TestPage({ colors, texts, numDays }) {
         </div>
       </div>
       <div className="basis-1/2 flex items-center justify-center relative">
-        <img
-          src={Calendar}
-          alt="Calendar"
-          style={{ width: "60%", height: "60%" }}
-          className="relative transform translate-x-1"
-        />
+        <img src={Calendar2} alt="Calendar" className="w-[60%] h-[60%] z-0" />
         <p className="absolute text-black text-5xl font-bold top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-28 z-10">
           {months[currentMonthIndex].name}
         </p>
@@ -175,37 +207,30 @@ export default function TestPage({ colors, texts, numDays }) {
 
         {/* Red line (only visible when 'A' is pressed) */}
         {showRedLine && (
+          <div className="absolute left-1/2 transform -translate-x-1/2 top-[65%] w-1/2 h-16 overflow-hidden">
+            <div
+              className="h-full bg-blue-500 animate-scroll-line"
+              style={{
+                backgroundColor: shuffledColors[0],
+                transform: "translateX(0.6rem)",
+              }}
+            />
+          </div>
+        )}
+
+        {/* Yellow line (only visible when 'S' is pressed) */}
+        {showYellowLine && (
           <div
-            className="absolute left-1/2 transform -translate-x-1/2 top-[46%]"
-            style={{
-              backgroundColor: shuffledColors[0],
-              width: "360px",
-              height: "220px",
-            }}
+            className="absolute left-1/2 transform -translate-x-1/2 top-[65%] w-1/2 h-6 animate-scroll-line"
+            style={{ backgroundColor: shuffledColors[1] }}
           ></div>
         )}
 
-        {/* Yellow line (only visible when 'D' is pressed and colors.length is 3) */}
-        {showYellowLine && colors.length >= 2 && (
+        {/* Blue line (only visible when 'D' is pressed) */}
+        {showBlueLine && (
           <div
-            className="absolute left-1/2 transform -translate-x-1/2 top-[46%]"
-            style={{
-              backgroundColor: shuffledColors[shuffledColors.length - 1],
-              width: "360px",
-              height: "220px",
-            }}
-          ></div>
-        )}
-
-        {/* Blue line (only visible when 'S' is pressed and colors.length is 3) */}
-        {showBlueLine && colors.length === 3 && (
-          <div
-            className="absolute left-1/2 transform -translate-x-1/2 top-[46%]"
-            style={{
-              backgroundColor: shuffledColors[1],
-              width: "360px",
-              height: "220px",
-            }} // Use colors[2] for blue line
+            className="absolute left-1/2 transform -translate-x-1/2 top-[65%] w-1/2 h-6 animate-scroll-line"
+            style={{ backgroundColor: shuffledColors[2] }}
           ></div>
         )}
       </div>

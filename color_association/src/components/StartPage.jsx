@@ -12,7 +12,10 @@ export default function StartPage({ colors, texts }) {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen space-y-8">
+    <div
+      className="flex flex-col items-center justify-center h-screen space-y-8 text-white"
+      style={{ backgroundColor: "#595959" }}
+    >
       <p className="w-1/2 text-left text-xl">
         In this trial, you will be seeing all of the items assigned to the
         following colors. Press the button to start the trial.
@@ -31,7 +34,7 @@ export default function StartPage({ colors, texts }) {
       </div>
 
       <button
-        className="px-4 py-2 bg-blue-500 text-white rounded"
+        className="px-4 py-2 bg-white text-black rounded"
         onClick={handleStart}
       >
         Start Trial

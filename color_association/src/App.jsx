@@ -4,6 +4,7 @@ import "./App.css";
 import TestPage from "./components/TestPage";
 import InstructionPage from "./components/InstructionPage";
 import StartPage from "./components/StartPage";
+import EndPage from "./components/EndPage";
 
 function App() {
   const twoColors = ["#990000", "#FFDF00"];
@@ -32,9 +33,10 @@ function App() {
         <Route
           path="/trialsThreeColors"
           element={
-            <TestPage colors={threeColors} texts={threeConcepts} numDays={20} />
+            <TestPage colors={threeColors} texts={threeConcepts} numDays={10} />
           }
         />
+        <Route path="/endpage" element={<EndPage />} />
       </Routes>
     </div>
   );

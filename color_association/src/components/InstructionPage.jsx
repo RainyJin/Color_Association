@@ -8,7 +8,10 @@ export default function InstructionPage() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen p-8">
+    <div
+      className="flex flex-col items-center justify-center h-screen p-8 text-white"
+      style={{ backgroundColor: "#595959" }}
+    >
       <h1 className="text-3xl font-bold mb-6">Instructions</h1>
       <p className="text-xl text-left w-3/5 mx-auto mb-4">
         In the following tasks, you are going to fill the calendar with the
@@ -26,7 +29,7 @@ export default function InstructionPage() {
         color-concept pair.
       </p>
       <button
-        className="bg-blue-500 text-white px-6 py-3 rounded-lg"
+        className="bg-white text-black px-6 py-3 rounded-lg"
         onClick={handleNext}
       >
         Next
