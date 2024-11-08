@@ -1,12 +1,13 @@
 import { useNavigate } from "react-router-dom";
 
-export default function StartPage({ colors, texts }) {
+export default function SpecificInstructionsPage({ trial }) {
   const navigate = useNavigate();
 
   const handleStart = () => {
-    if (colors.length === 2) {
+    const colorCount = Object.keys(trial).length;
+    if (colorCount === 2) {
       navigate("/trialsTwoColors");
-    } else if (colors.length === 3) {
+    } else if (colorCount === 3) {
       navigate("/trialsThreeColors");
     }
   };
@@ -22,13 +23,23 @@ export default function StartPage({ colors, texts }) {
       </p>
 
       <div className="flex space-x-4">
-        {colors.map((color, index) => (
+        {/* {colors.map((color, index) => (
           <div key={index} className="flex flex-col items-center">
             <p className="text-lg">{texts[index]}</p>
             <div
               style={{ backgroundColor: color }}
               className="w-24 h-24 rounded mt-2"
             ></div>
+          </div>
+        ))} */}
+        {Object.entries(trial).map(([fruit, color], index) => (
+          <div key={index} className="flex flex-col items-center">
+            <p className="text-lg">{fruit}</p> {/* Display fruit name */}
+            <div
+              style={{ backgroundColor: color }}
+              className="w-24 h-24 rounded mt-2"
+            ></div>{" "}
+            {/* Display corresponding color */}
           </div>
         ))}
       </div>

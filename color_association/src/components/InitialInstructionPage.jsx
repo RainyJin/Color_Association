@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 
-export default function InstructionPage() {
+export default function InitialInstructionPage() {
   const navigate = useNavigate();
 
   const handleNext = () => {

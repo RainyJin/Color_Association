@@ -8,14 +8,14 @@
 }
 
 .animate-scroll-line {
-  animation: progress 0.3s ease-in-out forwards;
+  animation: progress 0.2s ease-in-out forwards;
 }
 
 .slide-to-calendar {
-  transition: transform 0.4s ease-in-out;
-  transform: translateX(800px); /* Adjust to match the direction and distance */
+  transition: transform 0.2s ease-in-out;
+  transform: translateX(760px); /* Adjust to match the direction and distance */
 }
 
 .blank-screen {
-  transition: opacity 0.5s ease-in-out;
+  transition: opacity 0.3s ease-in-out;
 }
