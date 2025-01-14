@@ -1,7 +1,14 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-export default function InitialInstructionPage() {
+export default function InitialInstructionPage({ setIsShortTraining }) {
   const navigate = useNavigate();
+  const [showPopup, setShowPopup] = useState(true);
+
+  const handleTrainingLengthSelection = (isShort) => {
+    setIsShortTraining(isShort); // Pass the selection back to parent state
+    setShowPopup(false); // Close the popup
+  };
 
   const handleNext = () => {
     navigate("/instructionsTwoColors");
@@ -21,12 +28,8 @@ export default function InitialInstructionPage() {
         <br />
         <br />
         Then another item and its color will be added, you will again, fill the
-        next 50 calendar days with the correct item by pressing the key that
+        next n calendar days with the correct item by pressing the key that
         represents the color for the day's item.
-      </p>
-      <p className="text-xl text-left w-3/5 mx-auto mb-10">
-        You will go through 3 trials of 2 color-concept pairs and 1 added
-        color-concept pair.
       </p>
       <button
         className="bg-white text-black px-6 py-3 rounded-lg"
@@ -34,6 +37,31 @@ export default function InitialInstructionPage() {
       >
         Next
       </button>
+
+      {showPopup && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-8 rounded-lg text-black">
+            <h2 className="text-2xl font-bold mb-4">Choose Training Length</h2>
+            <p className="mb-4">
+              Please select the training length for the experiment.
+            </p>
+            <div className="flex justify-around">
+              <button
+                className="bg-blue-500 text-white px-4 py-2 rounded-lg"
+                onClick={() => handleTrainingLengthSelection(true)}
+              >
+                Short Training
+              </button>
+              <button
+                className="bg-green-500 text-white px-4 py-2 rounded-lg"
+                onClick={() => handleTrainingLengthSelection(false)}
+              >
+                Long Training
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

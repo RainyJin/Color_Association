@@ -14,32 +14,123 @@ function shuffleArray(array) {
   return array;
 }
 
+function generatePermutations(colors) {
+  if (colors.length === 0) return [];
+  if (colors.length === 1) return [colors];
+
+  const permutations = [];
+  for (let i = 0; i < colors.length; i++) {
+    const remainingColors = colors.slice(0, i).concat(colors.slice(i + 1));
+    const subPermutations = generatePermutations(remainingColors);
+    for (const perm of subPermutations) {
+      permutations.push([colors[i], ...perm]);
+    }
+  }
+  return permutations;
+}
+
+function generateOrders(items, mappings) {
+  const keys = Object.keys(items);
+
+  // Helper function to get all permutations of an array
+  function getPermutations(arr) {
+    if (arr.length <= 1) return [arr];
+
+    const result = [];
+    for (let i = 0; i < arr.length; i++) {
+      const current = arr[i];
+      const remaining = [...arr.slice(0, i), ...arr.slice(i + 1)];
+      const perms = getPermutations(remaining);
+
+      for (const perm of perms) {
+        result.push([current, ...perm]);
+      }
+    }
+    return result;
+  }
+
+  const result = [];
+  const keyPermutations = getPermutations(keys);
+
+  // For each key permutation
+  for (const keyOrder of keyPermutations) {
+    // For each possible starting position of the first color
+    for (let i = 0; i < mappings.length; i++) {
+      // Rotate the colors array to start with each color
+      const rotatedMappings = [...mappings.slice(i), ...mappings.slice(0, i)];
+
+      // Create the combination object
+      const combination = {};
+      keyOrder.forEach((key, index) => {
+        combination[key] = rotatedMappings[index];
+      });
+      result.push(combination);
+    }
+  }
+
+  return result;
+}
+
+function generateTrialSets(isShortTraining) {
+  // placeholder for now
+  const twoColorItems = { apple: null, banana: null };
+  const twoColorMapping = ["#5E2B3A", "#FCDB42"];
+  const twoColorOrders = generateOrders(twoColorItems, twoColorMapping);
+
+  const threeColorItems = { apple: null, banana: null, cherry: null };
+  const threeColorMapping = ["#5E2B3A", "#FCDB42", "#0E8A19"];
+  const threeColorOrders = generateOrders(threeColorItems, threeColorMapping);
+
+  // Generate training trial sets
+  const trainingRepetitions = isShortTraining ? 2 : 4;
+  const trainingTrials = [];
+  const blockOfTrainingTrials = [];
+  // concatenate to form 36 trials
+  for (let i = 0; i < 9; i++) {
+    blockOfTrainingTrials.push(...twoColorOrders);
+  }
+  for (let i = 0; i < trainingRepetitions; i++) {
+    trainingTrials.push(...shuffleArray([...blockOfTrainingTrials]));
+  }
+
+  // Generate testing trial sets with 18 combinations per block
+  const testingTrials = [];
+  const numberOfTestingBlocks = isShortTraining ? 19 : 15; //
+
+  for (let i = 0; i < numberOfTestingBlocks; i++) {
+    testingTrials.push(...shuffleArray([...threeColorOrders]));
+  }
+
+  return {
+    trainingTrials,
+    testingTrials,
+  };
+}
+
 function App() {
-  const trials = shuffleArray([
-    // #1
+  const trials = [
+    // #1 remap assigned to remap
     {
-      twoColorMapping: { apple: "#990000", banana: "#FFDF00" },
+      twoColorMapping: { apple: "#5E2B3A", banana: "#FCDB42" },
       threeColorMapping: {
-        apple: "#990000",
-        banana: "#FFDF00",
-        blueberry: "#0096FF",
+        apple: "#5E2B3A",
+        banana: "#FCDB42",
+        cherry: "#0E8A19",
       },
     },
-    // #2
-    {
-      twoColorMapping: { orange: "#FFA500", grape: "#800080" },
-      threeColorMapping: {
-        orange: "#FFA500",
-        grape: "#800080",
-        lime: "#00FF00",
-      },
-    },
-    // #3
-  ]);
-  // const twoColors = ["#990000", "#FFDF00"];
-  // const threeColors = ["#990000", "#FFDF00", "#0096FF"];
-  // const twoConcepts = ["apple", "banana"];
-  // const threeConcepts = ["apple", "banana", "blueberry"];
+    // TODO: Add the other 3 conditions
+  ];
+  const [isShortTraining, setIsShortTraining] = useState(true);
+  const [trialSets, setTrialSets] = useState({
+    trainingTrials: [],
+    testingTrials: [],
+  });
+
+  useEffect(() => {
+    const generatedTrials = generateTrialSets(isShortTraining);
+    setTrialSets(generatedTrials);
+  }, [isShortTraining]);
+
   const recordSelection = (
     selectedColor,
     isCorrect,
@@ -65,7 +156,12 @@ function App() {
   return (
     <div>
       <Routes>
-        <Route path="/" element={<InitialInstructionPage />} />
+        <Route
+          path="/"
+          element={
+            <InitialInstructionPage setIsShortTraining={setIsShortTraining} />
+          }
+        />
         <Route
           path="/instructionsTwoColors"
           element={
@@ -76,10 +172,11 @@ function App() {
           path="/trialsTwoColors"
           element={
             <TestPage
-              trial={trials[0].twoColorMapping}
-              numDays={4}
+              trial={trialSets.trainingTrials}
+              numDays={trialSets.trainingTrials.length}
               recordSelection={recordSelection}
               trialNum={0}
+              correctCombo={trials[0].twoColorMapping}
             />
           }
         />
@@ -93,10 +190,11 @@ function App() {
           path="/trialsThreeColors"
           element={
             <TestPage
-              trial={trials[0].threeColorMapping}
-              numDays={4}
+              trial={trialSets.testingTrials}
+              numDays={trialSets.testingTrials.length}
               recordSelection={recordSelection}
               trialNum={0}
+              correctCombo={trials[0].threeColorMapping}
             />
           }
         />

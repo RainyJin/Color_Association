@@ -20,22 +20,15 @@ const months = [
   { name: "Dec", days: 31 },
 ];
 
-const shuffleArray = (array) => {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-  return array;
-};
-
 export default function TestPage({
   trial,
   trialNum,
   numDays,
   recordSelection,
+  correctCombo,
 }) {
-  const colors = Object.values(trial);
-  const texts = Object.keys(trial);
+  const colors = Object.values(correctCombo);
+  const texts = Object.keys(correctCombo);
   const [currentMonthIndex, setCurrentMonthIndex] = useState(8); // 8 for September
   const [currentDay, setCurrentDay] = useState(1);
   const [currentItem, setCurrentItem] = useState("");
@@ -47,7 +40,7 @@ export default function TestPage({
   const [showYellowLine, setShowYellowLine] = useState(false);
   const [showBlueLine, setShowBlueLine] = useState(false);
 
-  const [shuffledColors, setShuffledColors] = useState([]);
+  const [currentColors, setCurrentColors] = useState([]);
   const [isSliding, setIsSliding] = useState(false); // Track sliding state
   const [showBlankScreen, setShowBlankScreen] = useState(false); // Track blank screen visibility
   const soundEffect = new Audio(soundFile);
@@ -84,12 +77,14 @@ export default function TestPage({
     }
   }, [totalDays, numDays, colors.length, navigate]);
 
-  // Randomize text and colors whenever the day changes
+  // Randomize the text that needs to be matched
   useEffect(() => {
     const randomIndex = Math.floor(Math.random() * texts.length);
     setCurrentItem(texts[randomIndex]);
 
-    setShuffledColors(shuffleArray([...colors]));
+    // set the next day's colors
+    setCurrentColors(Object.values(trial[currentDay]));
+    //setShuffledColors([...colors]);
   }, [currentDay]);
 
   useEffect(() => {
@@ -106,20 +101,20 @@ export default function TestPage({
 
       if (event.key === "a" || event.key === "A") {
         selectedIndex = 0;
-        color = shuffledColors[selectedIndex];
+        color = currentColors[selectedIndex];
         setShowRedLine(true);
         setShowYellowLine(false);
         setShowBlueLine(false);
       } else if (event.key === "d" || event.key === "D") {
         selectedIndex = colors.length === 2 ? 1 : 2; // Set the index based on color count
-        color = shuffledColors[selectedIndex];
+        color = currentColors[selectedIndex];
         setShowYellowLine(colors.length === 2);
         setShowBlueLine(colors.length === 3);
         setShowRedLine(false);
       } else if (event.key === "s" || event.key === "S") {
         if (colors.length === 3) {
           selectedIndex = 1;
-          color = shuffledColors[selectedIndex];
+          color = currentColors[selectedIndex];
           setShowYellowLine(true);
           setShowRedLine(false);
           setShowBlueLine(false);
@@ -127,7 +122,7 @@ export default function TestPage({
       }
 
       if (selectedIndex !== null) {
-        isCorrect = color === trial[currentItem];
+        isCorrect = color === correctCombo[currentItem];
         // Play sound if selection is incorrect
         if (!isCorrect) {
           soundEffect.currentTime = 0; // Reset playback position
@@ -152,7 +147,7 @@ export default function TestPage({
               trialNum: trialNum,
               colorCount: colors.length,
               displayedColorText: currentItem,
-              shuffledColors: shuffledColors,
+              shuffledColors: currentColors,
             };
 
             // Record the selection
@@ -167,8 +162,8 @@ export default function TestPage({
               setShowBlueLine(false);
               setShowBlankScreen(false); // Hide blank screen
             }, 100); // Wait for 100ms
-          }, 1000); // Wait for slide back to original spot
-        }, 1000); // Wait for slide animation (1000ms)
+          }, 600); // Wait for slide back to original spot
+        }, 600); // Wait for slide animation (1000ms)
       }
     };
 
@@ -179,7 +174,7 @@ export default function TestPage({
     return () => {
       window.removeEventListener("keydown", handleKeyPress);
     };
-  }, [shuffledColors, isSliding, startTime]);
+  }, [currentColors, isSliding, startTime]);
 
   return (
     <div
@@ -204,7 +199,7 @@ export default function TestPage({
             style={{ width: "60%", height: "60%", opacity: 0 }}
             className="relative"
           />
-          {shuffledColors.map((color, index) => {
+          {currentColors.map((color, index) => {
             let positionClass = "";
             if (colors.length === 2) {
               positionClass = index === 0 ? "left-1/4" : "right-1/4";
@@ -243,7 +238,7 @@ export default function TestPage({
             <div
               className="h-full bg-blue-500 animate-scroll-line"
               style={{
-                backgroundColor: shuffledColors[0],
+                backgroundColor: currentColors[0],
                 transform: "translateX(0.6rem)",
               }}
             />
@@ -255,7 +250,7 @@ export default function TestPage({
             <div
               className="h-full bg-blue-500 animate-scroll-line"
               style={{
-                backgroundColor: shuffledColors[1],
+                backgroundColor: currentColors[1],
                 transform: "translateX(0.6rem)",
               }}
             />
@@ -267,7 +262,7 @@ export default function TestPage({
             <div
               className="h-full bg-blue-500 animate-scroll-line"
               style={{
-                backgroundColor: shuffledColors[2],
+                backgroundColor: currentColors[2],
                 transform: "translateX(0.6rem)",
               }}
             />
