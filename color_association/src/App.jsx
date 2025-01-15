@@ -71,21 +71,38 @@ function generateOrders(items, mappings) {
   return result;
 }
 
-function generateTrialSets(isShortTraining) {
-  // placeholder for now
-  const twoColorItems = { apple: null, banana: null };
-  const twoColorMapping = ["#5E2B3A", "#FCDB42"];
-  const twoColorOrders = generateOrders(twoColorItems, twoColorMapping);
+function generateTrialSets(isShortTraining, currentTrial) {
+  if (!currentTrial) return { trainingTrials: [], testingTrials: [] };
 
-  const threeColorItems = { apple: null, banana: null, cherry: null };
-  const threeColorMapping = ["#5E2B3A", "#FCDB42", "#0E8A19"];
+  // Get the correct items based on the selected trial
+  const twoColorItems = Object.keys(currentTrial.twoColorMapping).reduce(
+    (obj, key) => {
+      obj[key] = null;
+      return obj;
+    },
+    {}
+  );
+
+  const threeColorItems = Object.keys(currentTrial.threeColorMapping).reduce(
+    (obj, key) => {
+      obj[key] = null;
+      return obj;
+    },
+    {}
+  );
+
+  const twoColorMapping = Object.values(currentTrial.twoColorMapping);
+  const threeColorMapping = Object.values(currentTrial.threeColorMapping);
+
+  // Rest of the generateTrialSets function remains the same
+  const twoColorOrders = generateOrders(twoColorItems, twoColorMapping);
   const threeColorOrders = generateOrders(threeColorItems, threeColorMapping);
 
   // Generate training trial sets
   const trainingRepetitions = isShortTraining ? 2 : 4;
   const trainingTrials = [];
   const blockOfTrainingTrials = [];
-  // concatenate to form 36 trials
+
   for (let i = 0; i < 9; i++) {
     blockOfTrainingTrials.push(...twoColorOrders);
   }
@@ -93,9 +110,9 @@ function generateTrialSets(isShortTraining) {
     trainingTrials.push(...shuffleArray([...blockOfTrainingTrials]));
   }
 
-  // Generate testing trial sets with 18 combinations per block
+  // Generate testing trial sets
   const testingTrials = [];
-  const numberOfTestingBlocks = isShortTraining ? 19 : 15; //
+  const numberOfTestingBlocks = isShortTraining ? 19 : 15;
 
   for (let i = 0; i < numberOfTestingBlocks; i++) {
     testingTrials.push(...shuffleArray([...threeColorOrders]));
@@ -113,23 +130,60 @@ function App() {
     {
       twoColorMapping: { apple: "#5E2B3A", banana: "#FCDB42" },
       threeColorMapping: {
+        apple: "#0E8A19",
+        banana: "#FCDB42",
+        cherry: "#5E2B3A",
+      },
+    },
+    // #2 remap assigned to fold-in
+    {
+      twoColorMapping: { apple: "#5E2B3A", banana: "#FCDB42" },
+      threeColorMapping: {
         apple: "#5E2B3A",
         banana: "#FCDB42",
         cherry: "#0E8A19",
       },
     },
-    // TODO: Add the other 3 conditions
+    // #3 fold-in assigned to fold-in
+    {
+      twoColorMapping: { apple: "#5E2B3A", banana: "#FCDB42" },
+      threeColorMapping: {
+        apple: "#5E2B3A",
+        banana: "#FCDB42",
+        celery: "#0E8A19",
+      },
+    },
+    // #4 fold-in assigned to remap
+    {
+      twoColorMapping: { apple: "#5E2B3A", banana: "#FCDB42" },
+      threeColorMapping: {
+        apple: "#0E8A19",
+        banana: "#FCDB42",
+        celery: "#5E2B3A",
+      },
+    },
   ];
   const [isShortTraining, setIsShortTraining] = useState(true);
+  const [currentTrial, setCurrentTrial] = useState(null);
   const [trialSets, setTrialSets] = useState({
     trainingTrials: [],
     testingTrials: [],
   });
 
   useEffect(() => {
-    const generatedTrials = generateTrialSets(isShortTraining);
+    const generatedTrials = generateTrialSets(isShortTraining, currentTrial);
     setTrialSets(generatedTrials);
-  }, [isShortTraining]);
+  }, [isShortTraining, currentTrial]);
+
+  const selectTrialAndTraining = (participantId) => {
+    const trialIndex = participantId % 4;
+    const isShort = participantId % 2 === 0;
+
+    const selectedTrial = trials[trialIndex];
+    setCurrentTrial(selectedTrial);
+    localStorage.setItem("currentTrial", JSON.stringify(selectedTrial));
+    setIsShortTraining(isShort);
+  };
 
   const recordSelection = (
     selectedColor,
@@ -159,13 +213,15 @@ function App() {
         <Route
           path="/"
           element={
-            <InitialInstructionPage setIsShortTraining={setIsShortTraining} />
+            <InitialInstructionPage
+              onParticipantIdSubmit={selectTrialAndTraining}
+            />
           }
         />
         <Route
           path="/instructionsTwoColors"
           element={
-            <SpecificInstructionsPage trial={trials[0].twoColorMapping} />
+            <SpecificInstructionsPage trial={currentTrial?.twoColorMapping} />
           }
         />
         <Route
@@ -176,14 +232,14 @@ function App() {
               numDays={trialSets.trainingTrials.length}
               recordSelection={recordSelection}
               trialNum={0}
-              correctCombo={trials[0].twoColorMapping}
+              correctCombo={currentTrial?.twoColorMapping}
             />
           }
         />
         <Route
           path="/instructionsThreeColors"
           element={
-            <SpecificInstructionsPage trial={trials[0].threeColorMapping} />
+            <SpecificInstructionsPage trial={currentTrial?.threeColorMapping} />
           }
         />
         <Route
@@ -194,7 +250,7 @@ function App() {
               numDays={trialSets.testingTrials.length}
               recordSelection={recordSelection}
               trialNum={0}
-              correctCombo={trials[0].threeColorMapping}
+              correctCombo={currentTrial?.threeColorMapping}
             />
           }
         />

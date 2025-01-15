@@ -11,11 +11,6 @@
   animation: progress 0.2s ease-in-out forwards;
 }
 
-.slide-to-calendar {
-  transition: transform 0.2s ease-in-out;
-  transform: translateX(760px); /* Adjust to match the direction and distance */
-}
-
 .blank-screen {
   transition: opacity 0.3s ease-in-out;
 }

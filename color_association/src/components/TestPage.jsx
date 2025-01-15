@@ -1,6 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import Calendar from "../assets/Calendar.svg";
 import Calendar2 from "../assets/Calendar (1).svg";
 import twoKeys from "../assets/2keys.svg";
 import soundFile from "../assets/t1000Hz.mp3";
@@ -29,11 +28,13 @@ export default function TestPage({
 }) {
   const colors = Object.values(correctCombo);
   const texts = Object.keys(correctCombo);
-  const [currentMonthIndex, setCurrentMonthIndex] = useState(8); // 8 for September
+  const [currentMonthIndex, setCurrentMonthIndex] = useState(8);
   const [currentDay, setCurrentDay] = useState(1);
   const [currentItem, setCurrentItem] = useState("");
   const [totalDays, setTotalDays] = useState(0);
   const [startTime, setStartTime] = useState(0);
+  const [currentTrialIndex, setCurrentTrialIndex] = useState(0);
+
   const navigate = useNavigate();
 
   const [showRedLine, setShowRedLine] = useState(false);
@@ -41,9 +42,40 @@ export default function TestPage({
   const [showBlueLine, setShowBlueLine] = useState(false);
 
   const [currentColors, setCurrentColors] = useState([]);
-  const [isSliding, setIsSliding] = useState(false); // Track sliding state
-  const [showBlankScreen, setShowBlankScreen] = useState(false); // Track blank screen visibility
+  const [isSliding, setIsSliding] = useState(false);
+  const [showBlankScreen, setShowBlankScreen] = useState(false);
   const soundEffect = new Audio(soundFile);
+
+  // Refs for calculating distances
+  const calendarRef = useRef(null);
+  const squareRefs = useRef([]);
+  const [slideDistances, setSlideDistances] = useState([]);
+
+  // Calculate distances between squares and calendar
+  const calculateSlideDistances = () => {
+    if (calendarRef.current && squareRefs.current.length > 0) {
+      const calendarRect = calendarRef.current.getBoundingClientRect();
+      const calendarCenter = calendarRect.left + calendarRect.width / 2;
+
+      const newDistances = squareRefs.current.map((ref) => {
+        if (ref) {
+          const squareRect = ref.getBoundingClientRect();
+          const squareCenter = squareRect.left + squareRect.width / 2;
+          return calendarCenter - squareCenter;
+        }
+        return 0;
+      });
+
+      setSlideDistances(newDistances);
+    }
+  };
+
+  // Recalculate distances on window resize
+  useEffect(() => {
+    calculateSlideDistances();
+    window.addEventListener("resize", calculateSlideDistances);
+    return () => window.removeEventListener("resize", calculateSlideDistances);
+  }, [currentColors]);
 
   const handleAdvanceDay = () => {
     setCurrentDay((prevDay) => {
@@ -51,53 +83,46 @@ export default function TestPage({
       if (prevDay < monthDays) {
         return prevDay + 1;
       } else {
-        // If we're at the last day of the month, reset to day 1
         setCurrentMonthIndex((prevMonthIndex) =>
           prevMonthIndex < 11 ? prevMonthIndex + 1 : 0
         );
         return 1;
       }
     });
-
     setTotalDays((prevDays) => prevDays + 1);
   };
 
   useEffect(() => {
     if (totalDays >= numDays) {
       if (colors.length === 2) {
-        // After 2-color trial, go to start page for 3-color trial
         navigate("/instructionsThreeColors");
       } else if (colors.length === 3) {
-        // After 3-color trial, go to the end page
         navigate("/endpage");
       } else {
-        // Go to last page
         navigate("/");
       }
     }
   }, [totalDays, numDays, colors.length, navigate]);
 
-  // Randomize the text that needs to be matched
+  const isTrainingPhase = colors.length === 2;
+
   useEffect(() => {
     const randomIndex = Math.floor(Math.random() * texts.length);
     setCurrentItem(texts[randomIndex]);
-
-    // set the next day's colors
     setCurrentColors(Object.values(trial[currentDay]));
-    //setShuffledColors([...colors]);
+    // Set start time when a new trial begins
+    setStartTime(Date.now());
   }, [currentDay]);
 
   useEffect(() => {
     const handleKeyPress = (event) => {
-      if (isSliding) return; // Prevent triggering animation during a slide
+      if (isSliding) return;
 
       let selectedIndex = null;
       let color = "";
       let isCorrect = false;
-      let reactionTime = 0; // To be calculated
-
-      const currentTime = Date.now(); // Get current time
-      reactionTime = currentTime - startTime; // Calculate reaction time
+      const currentTime = Date.now();
+      const reactionTime = currentTime - startTime;
 
       if (event.key === "a" || event.key === "A") {
         selectedIndex = 0;
@@ -106,7 +131,7 @@ export default function TestPage({
         setShowYellowLine(false);
         setShowBlueLine(false);
       } else if (event.key === "d" || event.key === "D") {
-        selectedIndex = colors.length === 2 ? 1 : 2; // Set the index based on color count
+        selectedIndex = colors.length === 2 ? 1 : 2;
         color = currentColors[selectedIndex];
         setShowYellowLine(colors.length === 2);
         setShowBlueLine(colors.length === 3);
@@ -123,25 +148,50 @@ export default function TestPage({
 
       if (selectedIndex !== null) {
         isCorrect = color === correctCombo[currentItem];
-        // Play sound if selection is incorrect
         if (!isCorrect) {
-          soundEffect.currentTime = 0; // Reset playback position
+          soundEffect.currentTime = 0;
           soundEffect.play();
         }
 
-        // Trigger the sliding animation
-        setIsSliding(true);
-        const element = document.getElementById(
-          `color-square-${selectedIndex}`
-        );
-        element.classList.add("slide-to-calendar");
+        // Record response in the appropriate array
+        const responseData = {
+          reactionTime: reactionTime,
+          response: color,
+          isCorrect: isCorrect,
+        };
 
-        // Wait for the animation to finish, then show the line
+        if (isTrainingPhase) {
+          const trainingResponses = JSON.parse(
+            localStorage.getItem("trainingResponses")
+          );
+          trainingResponses[currentTrialIndex] = responseData;
+          localStorage.setItem(
+            "trainingResponses",
+            JSON.stringify(trainingResponses)
+          );
+        } else {
+          const testingResponses = JSON.parse(
+            localStorage.getItem("testingResponses")
+          );
+          testingResponses[currentTrialIndex] = responseData;
+          localStorage.setItem(
+            "testingResponses",
+            JSON.stringify(testingResponses)
+          );
+        }
+
+        setIsSliding(true);
+        const element = squareRefs.current[selectedIndex];
+        if (element) {
+          element.style.transform = `translateX(${slideDistances[selectedIndex]}px)`;
+        }
+
         setTimeout(() => {
-          // Remove the sliding class to return the square to its original spot
           setTimeout(() => {
-            element.classList.remove("slide-to-calendar");
-            setIsSliding(false); // Allow new sliding after reset
+            if (element) {
+              element.style.transform = "translateX(0)";
+            }
+            setIsSliding(false);
 
             const trialData = {
               trialNum: trialNum,
@@ -150,43 +200,42 @@ export default function TestPage({
               shuffledColors: currentColors,
             };
 
-            // Record the selection
             recordSelection(color, isCorrect, reactionTime, trialData);
 
-            // Show blank screen, advance to the next day after delay, and hide it
-            setShowBlankScreen(true); // Show blank screen
+            setShowBlankScreen(true);
             setTimeout(() => {
               handleAdvanceDay();
+              setCurrentTrialIndex((prev) => prev + 1);
               setShowRedLine(false);
               setShowYellowLine(false);
               setShowBlueLine(false);
-              setShowBlankScreen(false); // Hide blank screen
-            }, 100); // Wait for 100ms
-          }, 600); // Wait for slide back to original spot
-        }, 600); // Wait for slide animation (1000ms)
+              setShowBlankScreen(false);
+            }, 100);
+          }, 600);
+        }, 600);
       }
     };
 
-    // Attach event listener
     window.addEventListener("keydown", handleKeyPress);
-
-    // Cleanup event listener on component unmount
-    return () => {
-      window.removeEventListener("keydown", handleKeyPress);
-    };
-  }, [currentColors, isSliding, startTime]);
+    return () => window.removeEventListener("keydown", handleKeyPress);
+  }, [
+    currentColors,
+    isSliding,
+    startTime,
+    slideDistances,
+    currentItem,
+    correctCombo,
+    currentTrialIndex,
+    isTrainingPhase,
+  ]);
 
   return (
     <div
       className="flex flex-row h-screen"
       style={{ backgroundColor: "#595959" }}
     >
-      {/* Blank screen overlay */}
       {showBlankScreen && (
-        <div
-          className="absolute top-0 left-0 w-full h-full"
-          style={{ backgroundColor: "#595959", zIndex: 50 }} // Use the same background color
-        />
+        <div className="absolute top-0 left-0 w-full h-full bg-[#595959] z-50" />
       )}
       <div className="basis-1/2 flex items-center justify-center text-7xl grid grid-rows-2">
         <p className="text-center mb-[-200px]">
@@ -214,17 +263,25 @@ export default function TestPage({
 
             return (
               <div
-                id={`color-square-${index}`}
                 key={index}
-                className={`absolute ${positionClass} w-24 h-24`}
-                style={{ backgroundColor: color, borderRadius: "0.5rem" }}
+                ref={(el) => (squareRefs.current[index] = el)}
+                className={`absolute ${positionClass} w-24 h-24 transition-transform duration-200 ease-in-out`}
+                style={{
+                  backgroundColor: color,
+                  borderRadius: "0.5rem",
+                }}
               ></div>
             );
           })}
         </div>
       </div>
       <div className="basis-1/2 flex items-center justify-center relative">
-        <img src={Calendar2} alt="Calendar" className="w-[60%] h-[60%] z-0" />
+        <img
+          ref={calendarRef}
+          src={Calendar2}
+          alt="Calendar"
+          className="w-[60%] h-[60%] z-0"
+        />
         <p className="absolute text-black text-5xl font-bold top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-28 z-10">
           {months[currentMonthIndex].name}
         </p>
@@ -232,7 +289,6 @@ export default function TestPage({
           {currentDay}
         </p>
 
-        {/* Red line (only visible when 'A' is pressed) */}
         {showRedLine && (
           <div className="absolute left-1/2 transform -translate-x-1/2 top-[65%] w-1/2 h-16 overflow-hidden">
             <div
