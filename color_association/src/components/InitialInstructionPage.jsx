@@ -9,85 +9,64 @@ export default function InitialInstructionPage({ onParticipantIdSubmit }) {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Validate that participantId is a number
     const id = parseInt(participantId);
     if (isNaN(id)) {
       setError("Please enter a valid number");
       return;
     }
 
-    // Check if the stored participant ID matches the entered ID
     const storedParticipantId = localStorage.getItem("participantId");
+    const existingProgress = JSON.parse(localStorage.getItem(`progress_${id}`));
 
     if (storedParticipantId && parseInt(storedParticipantId) === id) {
-      // Same participant ID: Resume progress
+      // Resume based on progress
       onParticipantIdSubmit(id);
-      navigate("/instructionsTwoColors");
-      return;
-    }
+    } else {
+      // Clear and initialize new participant data
+      localStorage.clear();
 
-    // Different ID or no ID: Clear data and initialize new participant
-    localStorage.clear();
+      const isShortTraining = id % 2 === 0;
+      const trainingTrialsCount = isShortTraining ? 72 : 144;
+      const testingTrialsCount = isShortTraining ? 324 : 270;
 
-    // Determine training length based on participant ID
-    const isShortTraining = id % 2 === 0;
-
-    // Store participant ID in localStorage
-    localStorage.setItem("participantId", id);
-
-    // Preload trial data
-    const trialData = [];
-    const trainingResponses = [];
-    const testingResponses = [];
-
-    // Initialize arrays with empty data
-    const trainingTrialsCount = isShortTraining ? 72 : 144;
-    const testingTrialsCount = isShortTraining ? 324 : 270;
-
-    for (let i = 0; i < trainingTrialsCount; i++) {
-      trainingResponses.push({
+      const trainingResponses = Array(trainingTrialsCount).fill({
         reactionTime: null,
         response: null,
         isCorrect: null,
       });
-    }
 
-    for (let i = 0; i < testingTrialsCount; i++) {
-      testingResponses.push({
+      const testingResponses = Array(testingTrialsCount).fill({
         reactionTime: null,
         response: null,
         isCorrect: null,
       });
+
+      localStorage.setItem("participantId", id);
+      localStorage.setItem(
+        `progress_${id}`,
+        JSON.stringify({
+          participantId: id,
+          trialIndex: id % 4,
+          isShort: isShortTraining,
+          startedTraining: false,
+          completedTraining: false,
+          startedTesting: false,
+          completedTesting: false,
+          currentTrainingDay: 0,
+          currentTestingDay: 0,
+        })
+      );
+      localStorage.setItem(
+        "trainingResponses",
+        JSON.stringify(trainingResponses)
+      );
+      localStorage.setItem(
+        "testingResponses",
+        JSON.stringify(testingResponses)
+      );
+
+      onParticipantIdSubmit(id);
     }
-
-    // Store preloaded data
-    localStorage.setItem("trialData", JSON.stringify(trialData));
-    localStorage.setItem(
-      "trainingResponses",
-      JSON.stringify(trainingResponses)
-    );
-    localStorage.setItem("testingResponses", JSON.stringify(testingResponses));
-
-    // Initialize progress for the new participant
-    const trialIndex = id % 4;
-    const progress = {
-      participantId: id,
-      trialIndex,
-      isShort: isShortTraining,
-      startedTraining: false,
-      completedTraining: false,
-      startedTesting: false,
-      completedTesting: false,
-      currentTrainingDay: 0,
-      currentTestingDay: 0,
-    };
-    localStorage.setItem(`progress_${id}`, JSON.stringify(progress));
-
-    // Call the callback to set up the trial and training length
-    onParticipantIdSubmit(id);
-
-    // Navigate to the first page
-    navigate("/instructionsTwoColors");
   };
 
   return (

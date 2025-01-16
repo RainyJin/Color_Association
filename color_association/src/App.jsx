@@ -193,8 +193,8 @@ function App() {
 
       localStorage.setItem("currentTrial", JSON.stringify(selectedTrial));
 
-      // Resume training or testing based on progress
       if (!existingProgress.completedTraining) {
+        // Navigate to training phase if training isn't complete
         setStartDay(existingProgress.currentTrainingDay || 0);
         if (!existingProgress.startedTraining) {
           navigate("/instructionsTwoColors");
@@ -202,15 +202,19 @@ function App() {
           navigate("/trialsTwoColors");
         }
       } else if (!existingProgress.completedTesting) {
+        // Navigate to testing phase if training is complete but testing isn't
         setStartDay(existingProgress.currentTestingDay || 0);
         if (!existingProgress.startedTesting) {
           navigate("/instructionsThreeColors");
         } else {
           navigate("/trialsThreeColors");
         }
+      } else {
+        // Navigate to the end page if both phases are complete
+        navigate("/endpage");
       }
     } else {
-      // Create a new progress entry if none exists
+      // Initialize new participant if no progress exists
       const trialIndex = participantId % 4;
       const isShort = participantId % 2 === 0;
 
