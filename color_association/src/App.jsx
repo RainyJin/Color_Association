@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import "./App.css";
 import TestPage from "./components/TestPage";
 import InitialInstructionPage from "./components/InitialInstructionPage";
@@ -125,6 +125,7 @@ function generateTrialSets(isShortTraining, currentTrial) {
 }
 
 function App() {
+  const navigate = useNavigate();
   const trials = [
     // #1 remap assigned to remap
     {
@@ -169,6 +170,7 @@ function App() {
     trainingTrials: [],
     testingTrials: [],
   });
+  const [startDay, setStartDay] = useState(0);
 
   useEffect(() => {
     const generatedTrials = generateTrialSets(isShortTraining, currentTrial);
@@ -176,13 +178,68 @@ function App() {
   }, [isShortTraining, currentTrial]);
 
   const selectTrialAndTraining = (participantId) => {
-    const trialIndex = participantId % 4;
-    const isShort = participantId % 2 === 0;
+    localStorage.setItem("participantId", participantId);
 
-    const selectedTrial = trials[trialIndex];
-    setCurrentTrial(selectedTrial);
-    localStorage.setItem("currentTrial", JSON.stringify(selectedTrial));
-    setIsShortTraining(isShort);
+    const existingProgress = JSON.parse(
+      localStorage.getItem(`progress_${participantId}`)
+    );
+    let selectedTrial;
+
+    if (existingProgress) {
+      // Use the existing progress to determine the trial and state
+      selectedTrial = trials[existingProgress.trialIndex];
+      setCurrentTrial(selectedTrial);
+      setIsShortTraining(existingProgress.isShort);
+
+      localStorage.setItem("currentTrial", JSON.stringify(selectedTrial));
+
+      // Resume training or testing based on progress
+      if (!existingProgress.completedTraining) {
+        setStartDay(existingProgress.currentTrainingDay || 0);
+        if (!existingProgress.startedTraining) {
+          navigate("/instructionsTwoColors");
+        } else {
+          navigate("/trialsTwoColors");
+        }
+      } else if (!existingProgress.completedTesting) {
+        setStartDay(existingProgress.currentTestingDay || 0);
+        if (!existingProgress.startedTesting) {
+          navigate("/instructionsThreeColors");
+        } else {
+          navigate("/trialsThreeColors");
+        }
+      }
+    } else {
+      // Create a new progress entry if none exists
+      const trialIndex = participantId % 4;
+      const isShort = participantId % 2 === 0;
+
+      selectedTrial = trials[trialIndex];
+      setStartDay(0);
+
+      const progress = {
+        participantId,
+        trialIndex,
+        isShort,
+        startedTraining: false,
+        completedTraining: false,
+        startedTesting: false,
+        completedTesting: false,
+        currentTrainingDay: 0,
+        currentTestingDay: 0,
+      };
+
+      localStorage.setItem(
+        `progress_${participantId}`,
+        JSON.stringify(progress)
+      );
+      localStorage.setItem("currentTrial", JSON.stringify(selectedTrial));
+      localStorage.setItem(`trialData_${participantId}`, JSON.stringify([]));
+
+      setCurrentTrial(selectedTrial);
+      setIsShortTraining(isShort);
+      navigate("/instructionsTwoColors");
+    }
   };
 
   const recordSelection = (
@@ -191,6 +248,8 @@ function App() {
     reactionTime,
     trialData
   ) => {
+    const participantId = localStorage.getItem("participantId");
+
     const trialDataEntry = {
       trialNum: trialData.trialNum,
       colorCount: trialData.colorCount,
@@ -199,13 +258,41 @@ function App() {
       selectedColor: selectedColor,
       isCorrect: isCorrect,
       reactionTime: reactionTime,
+      day: trialData.day,
+      timestamp: Date.now(),
     };
 
-    // Get existing data from local storage
-    const existingData = JSON.parse(localStorage.getItem("trialData")) || [];
-    existingData.push(trialDataEntry);
-    localStorage.setItem("trialData", JSON.stringify(existingData));
+    const existingData =
+      JSON.parse(localStorage.getItem(`trialData_${participantId}`)) || [];
+    const filteredData = existingData.filter(
+      (entry) => entry.day < trialData.day
+    );
+    filteredData.push(trialDataEntry);
+
+    localStorage.setItem(
+      `trialData_${participantId}`,
+      JSON.stringify(filteredData)
+    );
+
+    const isTrainingPhase = trialData.colorCount === 2;
+    const updates = isTrainingPhase
+      ? { currentTrainingDay: trialData.day + 1 }
+      : { currentTestingDay: trialData.day + 1 };
+    updateProgress(participantId, updates);
   };
+
+  function updateProgress(participantId, updates) {
+    const progressKey = `progress_${participantId}`;
+    const existingProgress =
+      JSON.parse(localStorage.getItem(progressKey)) || {};
+
+    const updatedProgress = {
+      ...existingProgress,
+      ...updates,
+    };
+
+    localStorage.setItem(progressKey, JSON.stringify(updatedProgress));
+  }
 
   return (
     <div>
@@ -221,7 +308,13 @@ function App() {
         <Route
           path="/instructionsTwoColors"
           element={
-            <SpecificInstructionsPage trial={currentTrial?.twoColorMapping} />
+            <SpecificInstructionsPage
+              trial={currentTrial?.twoColorMapping}
+              onStart={() => {
+                const participantId = localStorage.getItem("participantId");
+                updateProgress(participantId, { startedTraining: true });
+              }}
+            />
           }
         />
         <Route
@@ -233,13 +326,27 @@ function App() {
               recordSelection={recordSelection}
               trialNum={0}
               correctCombo={currentTrial?.twoColorMapping}
+              startDay={startDay}
+              onComplete={() => {
+                const participantId = localStorage.getItem("participantId");
+                updateProgress(participantId, {
+                  completedTraining: true,
+                  currentTrainingDay: trialSets.trainingTrials.length,
+                });
+              }}
             />
           }
         />
         <Route
           path="/instructionsThreeColors"
           element={
-            <SpecificInstructionsPage trial={currentTrial?.threeColorMapping} />
+            <SpecificInstructionsPage
+              trial={currentTrial?.threeColorMapping}
+              onStart={() => {
+                const participantId = localStorage.getItem("participantId");
+                updateProgress(participantId, { startedTesting: true });
+              }}
+            />
           }
         />
         <Route
@@ -251,6 +358,14 @@ function App() {
               recordSelection={recordSelection}
               trialNum={0}
               correctCombo={currentTrial?.threeColorMapping}
+              startDay={startDay}
+              onComplete={() => {
+                const participantId = localStorage.getItem("participantId");
+                updateProgress(participantId, {
+                  completedTesting: true,
+                  currentTestingDay: trialSets.testingTrials.length,
+                });
+              }}
             />
           }
         />

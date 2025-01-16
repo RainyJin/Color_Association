@@ -16,11 +16,21 @@ export default function InitialInstructionPage({ onParticipantIdSubmit }) {
       return;
     }
 
+    // Check if the stored participant ID matches the entered ID
+    const storedParticipantId = localStorage.getItem("participantId");
+
+    if (storedParticipantId && parseInt(storedParticipantId) === id) {
+      // Same participant ID: Resume progress
+      onParticipantIdSubmit(id);
+      navigate("/instructionsTwoColors");
+      return;
+    }
+
+    // Different ID or no ID: Clear data and initialize new participant
+    localStorage.clear();
+
     // Determine training length based on participant ID
     const isShortTraining = id % 2 === 0;
-
-    // Clear all localStorage data
-    localStorage.clear();
 
     // Store participant ID in localStorage
     localStorage.setItem("participantId", id);
@@ -31,14 +41,7 @@ export default function InitialInstructionPage({ onParticipantIdSubmit }) {
     const testingResponses = [];
 
     // Initialize arrays with empty data
-    // Training: 36 trials per block
-    // Short training: 2 blocks = 72 trials
-    // Long training: 4 blocks = 144 trials
     const trainingTrialsCount = isShortTraining ? 72 : 144;
-
-    // Testing: 18 trials per block
-    // Short training: 18 blocks = 324 trials
-    // Long training: 15 blocks = 270 trials
     const testingTrialsCount = isShortTraining ? 324 : 270;
 
     for (let i = 0; i < trainingTrialsCount; i++) {
@@ -65,10 +68,25 @@ export default function InitialInstructionPage({ onParticipantIdSubmit }) {
     );
     localStorage.setItem("testingResponses", JSON.stringify(testingResponses));
 
+    // Initialize progress for the new participant
+    const trialIndex = id % 4;
+    const progress = {
+      participantId: id,
+      trialIndex,
+      isShort: isShortTraining,
+      startedTraining: false,
+      completedTraining: false,
+      startedTesting: false,
+      completedTesting: false,
+      currentTrainingDay: 0,
+      currentTestingDay: 0,
+    };
+    localStorage.setItem(`progress_${id}`, JSON.stringify(progress));
+
     // Call the callback to set up the trial and training length
     onParticipantIdSubmit(id);
 
-    // Navigate to next page
+    // Navigate to the first page
     navigate("/instructionsTwoColors");
   };
 

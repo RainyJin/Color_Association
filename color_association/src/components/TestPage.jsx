@@ -25,15 +25,17 @@ export default function TestPage({
   numDays,
   recordSelection,
   correctCombo,
+  startDay = 0,
+  onComplete,
 }) {
   const colors = Object.values(correctCombo);
   const texts = Object.keys(correctCombo);
   const [currentMonthIndex, setCurrentMonthIndex] = useState(8);
-  const [currentDay, setCurrentDay] = useState(1);
+  const [currentDay, setCurrentDay] = useState(startDay + 1);
   const [currentItem, setCurrentItem] = useState("");
-  const [totalDays, setTotalDays] = useState(0);
+  const [totalDays, setTotalDays] = useState(startDay);
   const [startTime, setStartTime] = useState(0);
-  const [currentTrialIndex, setCurrentTrialIndex] = useState(0);
+  const [currentTrialIndex, setCurrentTrialIndex] = useState(startDay);
 
   const navigate = useNavigate();
 
@@ -94,6 +96,9 @@ export default function TestPage({
 
   useEffect(() => {
     if (totalDays >= numDays) {
+      if (onComplete) {
+        onComplete();
+      }
       if (colors.length === 2) {
         navigate("/instructionsThreeColors");
       } else if (colors.length === 3) {
@@ -102,7 +107,7 @@ export default function TestPage({
         navigate("/");
       }
     }
-  }, [totalDays, numDays, colors.length, navigate]);
+  }, [totalDays, numDays, colors.length, navigate, onComplete]);
 
   const isTrainingPhase = colors.length === 2;
 
@@ -198,6 +203,7 @@ export default function TestPage({
               colorCount: colors.length,
               displayedColorText: currentItem,
               shuffledColors: currentColors,
+              day: totalDays, // Add current day to trial data
             };
 
             recordSelection(color, isCorrect, reactionTime, trialData);
@@ -211,8 +217,8 @@ export default function TestPage({
               setShowBlueLine(false);
               setShowBlankScreen(false);
             }, 100);
-          }, 600);
-        }, 600);
+          }, 400);
+        }, 400);
       }
     };
 
