@@ -14,15 +14,20 @@ export default function SpecificInstructionsPage({ trial }) {
 
   return (
     <div
-      className="flex flex-col items-center justify-center h-screen space-y-8 text-white"
+      className="flex flex-col items-center justify-center h-screen space-y-4 text-white"
       style={{ backgroundColor: "#595959" }}
     >
-      <p className="w-1/2 text-left text-xl">
-        In this trial, you will be seeing all of the items assigned to the
-        following colors. Press the button to start the trial.
+      <p className="flex items-center text-xl">
+        For the first set of calendar days, you will be seeing the following
+        items to buy:
       </p>
-
-      <div className="flex space-x-4">
+      <div className="flex flex-col items-center">
+        <p className="text-xl">{Object.keys(trial).join(" & ")}</p>
+      </div>
+      <div className="mt-8 space-y-8">
+        <p className="text-xl">They are assigned to the following colors:</p>
+      </div>
+      <div className="flex space-x-8">
         {/* {colors.map((color, index) => (
           <div key={index} className="flex flex-col items-center">
             <p className="text-lg">{texts[index]}</p>
@@ -34,7 +39,7 @@ export default function SpecificInstructionsPage({ trial }) {
         ))} */}
         {Object.entries(trial).map(([fruit, color], index) => (
           <div key={index} className="flex flex-col items-center">
-            <p className="text-lg">{fruit}</p> {/* Display fruit name */}
+            <p className="text-xl">{fruit}</p> {/* Display item name */}
             <div
               style={{ backgroundColor: color }}
               className="w-24 h-24 rounded mt-2"
@@ -44,6 +49,7 @@ export default function SpecificInstructionsPage({ trial }) {
         ))}
       </div>
 
+      <p className="text-xl">Press the button to start the trial.</p>
       <button
         className="px-4 py-2 bg-white text-black rounded"
         onClick={handleStart}

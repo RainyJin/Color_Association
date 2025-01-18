@@ -136,8 +136,12 @@ export default function EndPage() {
       ) : (
         <>
           <p className="w-1/2 text-left text-xl">
-            This is the end of the study. Thank you for participating in this
-            study.
+            Thank you for participating in this study. You were assigned to a
+            specific training and testing condition as part of our research.
+            Please note that other participants may have been assigned to
+            different lengths of training and testing. These variations are a
+            crucial aspect of our study design and help us explore how different
+            training durations affect performance and outcomes.
           </p>
           <button
             className="px-4 py-2 bg-green-500 text-white rounded"

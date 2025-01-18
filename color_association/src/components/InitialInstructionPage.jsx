@@ -74,22 +74,9 @@ export default function InitialInstructionPage({ onParticipantIdSubmit }) {
       className="flex flex-col items-center justify-center h-screen p-8 text-white"
       style={{ backgroundColor: "#595959" }}
     >
-      <h1 className="text-3xl font-bold mb-6">Instructions</h1>
-      <p className="text-xl text-left w-3/5 mx-auto mb-4">
-        In the following tasks, you are going to fill the calendar with the
-        correct item to buy during each day for a number of days. Each item is
-        color coded. You will need to color code each day's calendar by pressing
-        the key that represents the color for the day's item.
-        <br />
-        <br />
-        Then another item and its color will be added, you will again, fill the
-        next n calendar days with the correct item by pressing the key that
-        represents the color for the day's item.
-      </p>
-
-      <form onSubmit={handleSubmit} className="mb-4">
+      <form onSubmit={handleSubmit} className="">
         <div className="flex flex-col items-center">
-          <label className="mb-2">
+          <label className="mb-16">
             Participant ID:
             <input
               type="number"
@@ -100,6 +87,28 @@ export default function InitialInstructionPage({ onParticipantIdSubmit }) {
             />
           </label>
           {error && <p className="text-red-500 mt-2">{error}</p>}
+          <h1 className="text-3xl font-bold mb-6">Instructions</h1>
+          <p className="text-xl text-left w-3/5 mx-auto mb-4">
+            In the following tasks, you are going to see a series of days from a
+            calendar. On each day you will see a text instruction for something
+            to buy (e.g., Buy Apple or Buy Banana). You will also see two
+            colored squares (e.g., one red and one green) underneath two
+            keyboard keys (e.g., A & D). Your job is to press the key
+            corresponding to the color that goes with the to-be-bought item as
+            quickly as possible. Don’t press so quickly that you make mistakes,
+            but press as fast as you can without making mistakes.
+            <br />
+            <br />
+            You will start with just two possible items to buy and two
+            associated colors. After completing some number of days with those
+            two items and colors, a third item and color will be added. Your
+            overall task will be the same though, press the key corresponding to
+            the color that goes with the to-be-bought item for the day.
+          </p>
+          <p className="text-xl text-left w-3/5 mx-auto mb-4">
+            Press the Next button to see the to-be-bought items and associated
+            colors for the first set of calendar days.{" "}
+          </p>
           <button
             type="submit"
             className="bg-white text-black px-6 py-3 rounded-lg mt-4"

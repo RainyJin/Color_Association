@@ -63,7 +63,7 @@ export default function TestPage({
         if (ref) {
           const squareRect = ref.getBoundingClientRect();
           const squareCenter = squareRect.left + squareRect.width / 2;
-          return calendarCenter - squareCenter;
+          return calendarCenter - squareCenter + 60;
         }
         return 0;
       });
@@ -132,37 +132,24 @@ export default function TestPage({
       if (event.key === "a" || event.key === "A") {
         selectedIndex = 0;
         color = currentColors[selectedIndex];
-        setShowRedLine(true);
-        setShowYellowLine(false);
-        setShowBlueLine(false);
       } else if (event.key === "d" || event.key === "D") {
         selectedIndex = colors.length === 2 ? 1 : 2;
         color = currentColors[selectedIndex];
-        setShowYellowLine(colors.length === 2);
-        setShowBlueLine(colors.length === 3);
-        setShowRedLine(false);
       } else if (event.key === "s" || event.key === "S") {
         if (colors.length === 3) {
           selectedIndex = 1;
           color = currentColors[selectedIndex];
-          setShowYellowLine(true);
-          setShowRedLine(false);
-          setShowBlueLine(false);
         }
       }
 
       if (selectedIndex !== null) {
         isCorrect = color === correctCombo[currentItem];
-        if (!isCorrect) {
-          soundEffect.currentTime = 0;
-          soundEffect.play();
-        }
 
-        // Record response in the appropriate array
+        // Record response data
         const responseData = {
-          reactionTime: reactionTime,
+          reactionTime,
           response: color,
-          isCorrect: isCorrect,
+          isCorrect,
         };
 
         if (isTrainingPhase) {
@@ -185,25 +172,90 @@ export default function TestPage({
           );
         }
 
-        setIsSliding(true);
-        const element = squareRefs.current[selectedIndex];
-        if (element) {
-          element.style.transform = `translateX(${slideDistances[selectedIndex]}px)`;
-        }
+        if (!isCorrect) {
+          // Play sound effect and show shake animation for incorrect selection
+          soundEffect.currentTime = 0;
+          soundEffect.play();
 
-        setTimeout(() => {
+          const selectedElement = squareRefs.current[selectedIndex];
+          selectedElement.classList.add("animate-shake");
+
+          // Find correct color and animate after shake
+          const correctIndex = currentColors.findIndex(
+            (c) => c === correctCombo[currentItem]
+          );
+
           setTimeout(() => {
-            if (element) {
-              element.style.transform = "translateX(0)";
+            selectedElement.classList.remove("animate-shake");
+            const correctElement = squareRefs.current[correctIndex];
+
+            if (correctElement) {
+              setIsSliding(true);
+              // Ensure full slide for incorrect selections
+              correctElement.style.transform = `translateX(${
+                slideDistances[correctIndex] + 70
+              }px)`;
+
+              // Show line for correct color
+              setShowRedLine(correctIndex === 0);
+              setShowYellowLine(correctIndex === 1);
+              setShowBlueLine(correctIndex === 2);
             }
+
+            // Complete trial after animations
+            setTimeout(() => {
+              squareRefs.current.forEach((ref) => {
+                if (ref) ref.style.transform = "translateX(0)";
+              });
+              setIsSliding(false);
+
+              const trialData = {
+                trialNum,
+                colorCount: colors.length,
+                displayedColorText: currentItem,
+                shuffledColors: currentColors,
+                day: totalDays,
+              };
+
+              recordSelection(color, isCorrect, reactionTime, trialData);
+
+              setShowBlankScreen(true);
+              setTimeout(() => {
+                handleAdvanceDay();
+                setCurrentTrialIndex((prev) => prev + 1);
+                setShowRedLine(false);
+                setShowYellowLine(false);
+                setShowBlueLine(false);
+                setShowBlankScreen(false);
+              }, 100);
+            }, 800);
+          }, 500);
+        } else {
+          // Animate correct selection
+          setIsSliding(true);
+          const element = squareRefs.current[selectedIndex];
+          if (element) {
+            element.style.transform = `translateX(${slideDistances[selectedIndex]}px)`;
+
+            // Show line for correct color
+            setShowRedLine(selectedIndex === 0);
+            setShowYellowLine(selectedIndex === 1);
+            setShowBlueLine(selectedIndex === 2);
+          }
+
+          // Complete trial after animation
+          setTimeout(() => {
+            squareRefs.current.forEach((ref) => {
+              if (ref) ref.style.transform = "translateX(0)";
+            });
             setIsSliding(false);
 
             const trialData = {
-              trialNum: trialNum,
+              trialNum,
               colorCount: colors.length,
               displayedColorText: currentItem,
               shuffledColors: currentColors,
-              day: totalDays, // Add current day to trial data
+              day: totalDays,
             };
 
             recordSelection(color, isCorrect, reactionTime, trialData);
@@ -217,8 +269,8 @@ export default function TestPage({
               setShowBlueLine(false);
               setShowBlankScreen(false);
             }, 100);
-          }, 400);
-        }, 400);
+          }, 800);
+        }
       }
     };
 
@@ -233,6 +285,9 @@ export default function TestPage({
     correctCombo,
     currentTrialIndex,
     isTrainingPhase,
+    colors.length,
+    trialNum,
+    totalDays,
   ]);
 
   return (
@@ -271,7 +326,7 @@ export default function TestPage({
               <div
                 key={index}
                 ref={(el) => (squareRefs.current[index] = el)}
-                className={`absolute ${positionClass} w-24 h-24 transition-transform duration-200 ease-in-out`}
+                className={`absolute ${positionClass} w-24 h-24 transition-transform duration-200 ease-in-out color-square`}
                 style={{
                   backgroundColor: color,
                   borderRadius: "0.5rem",

@@ -255,8 +255,6 @@ function App() {
     const participantId = localStorage.getItem("participantId");
 
     const trialDataEntry = {
-      trialNum: trialData.trialNum,
-      colorCount: trialData.colorCount,
       displayedColorText: trialData.displayedColorText,
       shuffledColors: trialData.shuffledColors,
       selectedColor: selectedColor,
