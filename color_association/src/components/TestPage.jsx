@@ -35,6 +35,7 @@ export default function TestPage({
   const [currentItem, setCurrentItem] = useState("");
   const [totalDays, setTotalDays] = useState(startDay);
   const [startTime, setStartTime] = useState(0);
+  const [isTrialReady, setIsTrialReady] = useState(false);
   const [currentTrialIndex, setCurrentTrialIndex] = useState(startDay);
 
   const navigate = useNavigate();
@@ -111,17 +112,26 @@ export default function TestPage({
 
   const isTrainingPhase = colors.length === 2;
 
+  // Prepare the trial
   useEffect(() => {
     const randomIndex = Math.floor(Math.random() * texts.length);
     setCurrentItem(texts[randomIndex]);
     setCurrentColors(Object.values(trial[currentDay]));
-    // Set start time when a new trial begins
-    setStartTime(Date.now());
+    setIsTrialReady(false);
+
+    // Use requestAnimationFrame to ensure the UI has updated
+    const rafId = requestAnimationFrame(() => {
+      // Set start time after the UI has had a chance to render
+      setStartTime(Date.now());
+      setIsTrialReady(true);
+    });
+
+    return () => cancelAnimationFrame(rafId);
   }, [currentDay]);
 
   useEffect(() => {
     const handleKeyPress = (event) => {
-      if (isSliding) return;
+      if (!isTrialReady || isSliding) return;
 
       let selectedIndex = null;
       let color = "";
@@ -282,13 +292,16 @@ export default function TestPage({
     startTime,
     slideDistances,
     currentItem,
-    correctCombo,
     currentTrialIndex,
     isTrainingPhase,
-    colors.length,
     trialNum,
     totalDays,
+    isTrialReady,
   ]);
+
+  if (!isTrialReady) {
+    return <div style={{ backgroundColor: "#595959" }} className="h-screen" />;
+  }
 
   return (
     <div

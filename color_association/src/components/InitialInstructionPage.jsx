@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import SaveDataButton from "./SaveDataButton";
 
 export default function InitialInstructionPage({ onParticipantIdSubmit }) {
   const navigate = useNavigate();
@@ -76,7 +77,7 @@ export default function InitialInstructionPage({ onParticipantIdSubmit }) {
     >
       <form onSubmit={handleSubmit} className="">
         <div className="flex flex-col items-center">
-          <label className="mb-16">
+          <label className="mb-6">
             Participant ID:
             <input
               type="number"
@@ -111,10 +112,11 @@ export default function InitialInstructionPage({ onParticipantIdSubmit }) {
           </p>
           <button
             type="submit"
-            className="bg-white text-black px-6 py-3 rounded-lg mt-4"
+            className="bg-white text-black px-6 py-3 rounded-lg mt-4 mb-4"
           >
             Next
           </button>
+          <SaveDataButton className="bg-grey text-black px-6 py-3 rounded-lg" />
         </div>
       </form>
     </div>

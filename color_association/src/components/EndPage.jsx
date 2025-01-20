@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import SaveDataButton from "./SaveDataButton";
 
 export default function EndPage() {
   const navigate = useNavigate();
