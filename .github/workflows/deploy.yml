@@ -25,29 +25,24 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Change directory
-        run: cd color_association
-
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
       - name: Install dependencies
+        working-directory: color_association
         run: npm ci
 
       - name: Build project
+        working-directory: color_association
         run: npm run build
 
       - name: Upload artifact to GitHub Pages
         uses: actions/upload-pages-artifact@v3
         with:
-          path: "./dist" # Ensure your build output folder is 'dist'
+          path: "color_association/dist"
 
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-        with:
-          branch: gh-pages # Ensure this is correct
-          folder: dist # This is where your build files are
-
