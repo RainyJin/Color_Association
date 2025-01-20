@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Routes, Route, useNavigate } from "react-router-dom";
+import { HashRouter, Route, useNavigate } from "react-router-dom";
 import "./App.css";
 import TestPage from "./components/TestPage";
 import InitialInstructionPage from "./components/InitialInstructionPage";
@@ -298,7 +298,7 @@ function App() {
 
   return (
     <div>
-      <Routes>
+      <HashRouter>
         <Route
           path="/"
           element={
@@ -372,7 +372,7 @@ function App() {
           }
         />
         <Route path="/endpage" element={<EndPage />} />
-      </Routes>
+      </HashRouter>
     </div>
   );
 }
