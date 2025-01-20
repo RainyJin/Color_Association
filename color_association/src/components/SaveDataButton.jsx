@@ -10,19 +10,29 @@ const SaveDataButton = () => {
 
     const trialData =
       JSON.parse(localStorage.getItem(`trialData_${participantId}`)) || [];
-
     if (trialData.length === 0) {
       alert("No trial data found.");
       return;
     }
 
+    // Retrieve demographic information
+    const age = localStorage.getItem("age");
+    const gender = localStorage.getItem("gender");
+    const ethnicity = localStorage.getItem("ethnicity");
+
+    // Ensure demographic data exists
+    if (!age || !gender || !ethnicity) {
+      alert("Missing demographic information.");
+      return;
+    }
+
     // Create header row
     const csvHeader =
-      "Day,Displayed Color Text,Shuffled Colors,Selected Color,Is Correct,Reaction Time,Timestamp\n";
+      "Age,Gender,Ethnicity,Trial Type,Day,Displayed Color Text,Shuffled Colors,Selected Color,Is Correct,Reaction Time,Timestamp\n";
 
-    // Map trial data to rows
+    // Map trial data to rows and include demographic info
     const csvRows = trialData.map((entry) => {
-      return `${entry.day},"${
+      return `${age},${gender},${ethnicity},${entry.trialType},${entry.day},"${
         entry.displayedColorText
       }","${entry.shuffledColors.join(";")}","${entry.selectedColor}",${
         entry.isCorrect
@@ -37,7 +47,7 @@ const SaveDataButton = () => {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `participant_${participantId}_trial_data_interim.csv`;
+    link.download = `participant_${participantId}_trial_data_with_demographics.csv`;
     link.click();
     URL.revokeObjectURL(url);
   };

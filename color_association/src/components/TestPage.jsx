@@ -27,6 +27,7 @@ export default function TestPage({
   correctCombo,
   startDay = 0,
   onComplete,
+  trialType,
 }) {
   const colors = Object.values(correctCombo);
   const texts = Object.keys(correctCombo);
@@ -225,6 +226,7 @@ export default function TestPage({
                 displayedColorText: currentItem,
                 shuffledColors: currentColors,
                 day: totalDays,
+                trialType: trialType,
               };
 
               recordSelection(color, isCorrect, reactionTime, trialData);
@@ -266,6 +268,7 @@ export default function TestPage({
               displayedColorText: currentItem,
               shuffledColors: currentColors,
               day: totalDays,
+              trialType: isTrainingPhase ? "training" : "testing",
             };
 
             recordSelection(color, isCorrect, reactionTime, trialData);

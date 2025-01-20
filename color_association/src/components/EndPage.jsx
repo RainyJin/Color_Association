@@ -16,14 +16,26 @@ export default function EndPage() {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log({ participantId, age, gender, ethnicity });
+
+    // Store demographic data in localStorage
+    localStorage.setItem("participant_Id", participantId);
+    localStorage.setItem("age", age);
+    localStorage.setItem("gender", gender);
+    localStorage.setItem("ethnicity", ethnicity);
+
     setSubmitted(true);
   };
 
   // Function to download trial data as CSV with demographic data
   const downloadCSV = () => {
+    // Get demographic data from localStorage
+    const age = localStorage.getItem("age");
+    const gender = localStorage.getItem("gender");
+    const ethnicity = localStorage.getItem("ethnicity");
+    const participantId = localStorage.getItem("participant_Id");
     // Get trial data from localStorage
-    const trialData = JSON.parse(localStorage.getItem("trialData")) || [];
-
+    const trialData =
+      JSON.parse(localStorage.getItem(`trialData_${participantId}`)) || [];
     if (trialData.length === 0) {
       alert("No trial data found.");
       return;
@@ -31,15 +43,15 @@ export default function EndPage() {
 
     // Create header row with demographic information and trial data fields
     const csvHeader =
-      "Age,Gender,Ethnicity,Trial Number,Color Count,Displayed Color Text,Shuffled Colors,Selected Color,Correct,Reaction Time\n";
+      "Age,Gender,Ethnicity,Trial Type,Day,Displayed Color Text,Shuffled Colors,Selected Color,Correct,Reaction Time,Timestamp\n";
 
     // Map trial data to rows and add demographic info at the beginning of each row
     const csvRows = trialData.map((entry) => {
-      return `${age},${gender},${ethnicity},${entry.trialNum},${
-        entry.colorCount
-      },"${entry.displayedColorText}","${entry.shuffledColors.join(";")}",${
-        entry.selectedColor
-      },${entry.isCorrect},${entry.reactionTime}`;
+      return `${age},${gender},${ethnicity},${entry.trialType},${entry.day}"${
+        entry.displayedColorText
+      }","${entry.shuffledColors.join(";")}",${entry.selectedColor},${
+        entry.isCorrect
+      },${entry.reactionTime},${entry.timestamp}`;
     });
 
     // Combine header and rows into full CSV content

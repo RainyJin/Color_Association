@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { HashRouter, Route, useNavigate } from "react-router-dom";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import "./App.css";
 import TestPage from "./components/TestPage";
 import InitialInstructionPage from "./components/InitialInstructionPage";
@@ -255,6 +255,7 @@ function App() {
     const participantId = localStorage.getItem("participantId");
 
     const trialDataEntry = {
+      trialType: trialData.trialType,
       displayedColorText: trialData.displayedColorText,
       shuffledColors: trialData.shuffledColors,
       selectedColor: selectedColor,
@@ -266,14 +267,13 @@ function App() {
 
     const existingData =
       JSON.parse(localStorage.getItem(`trialData_${participantId}`)) || [];
-    const filteredData = existingData.filter(
-      (entry) => entry.day < trialData.day
-    );
-    filteredData.push(trialDataEntry);
+
+    // Directly push the new entry without filtering
+    existingData.push(trialDataEntry);
 
     localStorage.setItem(
       `trialData_${participantId}`,
-      JSON.stringify(filteredData)
+      JSON.stringify(existingData)
     );
 
     const isTrainingPhase = trialData.colorCount === 2;
@@ -298,7 +298,7 @@ function App() {
 
   return (
     <div>
-      <HashRouter>
+      <Routes>
         <Route
           path="/"
           element={
@@ -336,6 +336,7 @@ function App() {
                   currentTrainingDay: trialSets.trainingTrials.length,
                 });
               }}
+              trialType={"training"}
             />
           }
         />
@@ -368,11 +369,12 @@ function App() {
                   currentTestingDay: trialSets.testingTrials.length,
                 });
               }}
+              trialType={"testing"}
             />
           }
         />
         <Route path="/endpage" element={<EndPage />} />
-      </HashRouter>
+      </Routes>
     </div>
   );
 }
