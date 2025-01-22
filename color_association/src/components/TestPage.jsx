@@ -252,7 +252,9 @@ export default function TestPage({
           setIsSliding(true);
           const element = squareRefs.current[selectedIndex];
           if (element) {
-            element.style.transform = `translateX(${slideDistances[selectedIndex]}px)`;
+            element.style.transform = `translateX(${
+              slideDistances[selectedIndex] + 50
+            }px)`;
 
             // Show line for correct color
             setShowRedLine(selectedIndex === 0);
