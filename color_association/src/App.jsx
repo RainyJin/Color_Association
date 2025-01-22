@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import "./App.css";
 import TestPage from "./components/TestPage";
+import ParticipantIdPage from "./components/ParticipantIdPage";
 import InitialInstructionPage from "./components/InitialInstructionPage";
 import SpecificInstructionsPage from "./components/SpecificInstructionsPage";
 import EndPage from "./components/EndPage";
@@ -301,6 +302,12 @@ function App() {
       <Routes>
         <Route
           path="/"
+          element={
+            <ParticipantIdPage onParticipantIdSubmit={selectTrialAndTraining} />
+          }
+        />
+        <Route
+          path="/initialInstruction"
           element={
             <InitialInstructionPage
               onParticipantIdSubmit={selectTrialAndTraining}

@@ -38,6 +38,7 @@ export default function TestPage({
   const [startTime, setStartTime] = useState(0);
   const [isTrialReady, setIsTrialReady] = useState(false);
   const [currentTrialIndex, setCurrentTrialIndex] = useState(startDay);
+  const [canPress, setCanPress] = useState(true);
 
   const navigate = useNavigate();
 
@@ -59,13 +60,14 @@ export default function TestPage({
   const calculateSlideDistances = () => {
     if (calendarRef.current && squareRefs.current.length > 0) {
       const calendarRect = calendarRef.current.getBoundingClientRect();
-      const calendarCenter = calendarRect.left + calendarRect.width / 2;
+      const calendarCenterX = calendarRect.left + calendarRect.width / 2;
 
       const newDistances = squareRefs.current.map((ref) => {
         if (ref) {
           const squareRect = ref.getBoundingClientRect();
-          const squareCenter = squareRect.left + squareRect.width / 2;
-          return calendarCenter - squareCenter + 60;
+          const squareRight = squareRect.left + squareRect.width;
+          // Calculate the distance to slide so the right edge of the square aligns with calendar center
+          return calendarCenterX - squareRight;
         }
         return 0;
       });
@@ -133,6 +135,9 @@ export default function TestPage({
   useEffect(() => {
     const handleKeyPress = (event) => {
       if (!isTrialReady || isSliding) return;
+
+      setCanPress(false);
+      setTimeout(() => setCanPress(true), 1000); // 1 second cooldown
 
       let selectedIndex = null;
       let color = "";
