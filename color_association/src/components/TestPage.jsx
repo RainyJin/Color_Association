@@ -253,7 +253,7 @@ export default function TestPage({
           const element = squareRefs.current[selectedIndex];
           if (element) {
             element.style.transform = `translateX(${
-              slideDistances[selectedIndex] + 50
+              slideDistances[selectedIndex] + 100
             }px)`;
 
             // Show line for correct color
