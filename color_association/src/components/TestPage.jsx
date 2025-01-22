@@ -65,7 +65,7 @@ export default function TestPage({
       const newDistances = squareRefs.current.map((ref) => {
         if (ref) {
           const squareRect = ref.getBoundingClientRect();
-          const squareRight = squareRect.left + squareRect.width;
+          const squareRight = squareRect.left + squareRect.width + 40;
           // Calculate the distance to slide so the right edge of the square aligns with calendar center
           return calendarCenterX - squareRight;
         }
