@@ -17,8 +17,21 @@ export default function SpecificInstructionsPage({ trial }) {
       className="flex flex-col items-center justify-center h-screen space-y-4 text-white"
       style={{ backgroundColor: "#595959" }}
     >
+      {Object.keys(trial).length === 3 ? (
+        <div className="flex flex-col items-center justify-center">
+          <p className="flex items-center text-xl">
+            Press 'A' if you think it should be the left colored square and 'D'
+            if you think it should be the right.{" "}
+          </p>
+          <p className="flex items-center text-xl">
+            Press 'S' if you think it should be the middle colored square.
+          </p>
+        </div>
+      ) : (
+        <></>
+      )}
       <p className="flex items-center text-xl">
-        For the first set of calendar days, you will be seeing the following
+        For the current set of calendar days, you will be seeing the following
         items to buy:
       </p>
       <div className="flex flex-col items-center">

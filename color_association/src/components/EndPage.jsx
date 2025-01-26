@@ -125,7 +125,7 @@ export default function EndPage() {
             </div>
             <div className="flex flex-col">
               <label htmlFor="ethnicity" className="text-lg">
-                Ethnicity:
+                Race/Ethnicity:
               </label>
               <input
                 type="text"
@@ -133,7 +133,7 @@ export default function EndPage() {
                 value={ethnicity}
                 onChange={(e) => setEthnicity(e.target.value)}
                 className="border rounded p-2"
-                placeholder="Enter your ethnicity"
+                placeholder="Enter your race/ethnicity"
                 required
               />
             </div>

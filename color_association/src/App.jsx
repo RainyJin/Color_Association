@@ -95,7 +95,6 @@ function generateTrialSets(isShortTraining, currentTrial) {
   const twoColorMapping = Object.values(currentTrial.twoColorMapping);
   const threeColorMapping = Object.values(currentTrial.threeColorMapping);
 
-  // Rest of the generateTrialSets function remains the same
   const twoColorOrders = generateOrders(twoColorItems, twoColorMapping);
   const threeColorOrders = generateOrders(threeColorItems, threeColorMapping);
 
@@ -113,10 +112,14 @@ function generateTrialSets(isShortTraining, currentTrial) {
 
   // Generate testing trial sets
   const testingTrials = [];
-  const numberOfTestingBlocks = isShortTraining ? 19 : 15;
+  const blockOfTestingTrials = []; //block of testing trials also 36 trials per block
+  const numberOfTestingBlocks = isShortTraining ? 10 : 8;
 
+  for (let i = 0; i < 2; i++) {
+    blockOfTestingTrials.push(...threeColorOrders);
+  }
   for (let i = 0; i < numberOfTestingBlocks; i++) {
-    testingTrials.push(...shuffleArray([...threeColorOrders]));
+    testingTrials.push(...shuffleArray([...blockOfTestingTrials]));
   }
 
   return {

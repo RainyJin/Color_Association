@@ -26,9 +26,9 @@ export default function ParticipantIdPage({ onParticipantIdSubmit }) {
       // Clear and initialize new participant data
       localStorage.clear();
 
-      const isShortTraining = id % 2 === 0;
+      const isShortTraining = Math.floor(participantId / 4) % 2 === 0;
       const trainingTrialsCount = isShortTraining ? 72 : 144;
-      const testingTrialsCount = isShortTraining ? 324 : 270;
+      const testingTrialsCount = isShortTraining ? 360 : 288;
 
       const trainingResponses = Array(trainingTrialsCount).fill({
         reactionTime: null,
@@ -55,6 +55,8 @@ export default function ParticipantIdPage({ onParticipantIdSubmit }) {
           completedTesting: false,
           currentTrainingDay: 0,
           currentTestingDay: 0,
+          trainingTrialsCount: trainingTrialsCount,
+          testingTrialsCount: testingTrialsCount,
         })
       );
       localStorage.setItem(

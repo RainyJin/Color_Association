@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Calendar2 from "../assets/Calendar (1).svg";
 import twoKeys from "../assets/2keys.svg";
 import soundFile from "../assets/t1000Hz.mp3";
+import BlockCompletionModal from "./BlockCompletionModal";
 
 const months = [
   { name: "Jan", days: 31 },
@@ -56,6 +57,10 @@ export default function TestPage({
   const squareRefs = useRef([]);
   const [slideDistances, setSlideDistances] = useState([]);
 
+  const [showBlockModal, setShowBlockModal] = useState(false);
+  const [currentBlock, setCurrentBlock] = useState(1);
+  const totalBlocks = Math.ceil(numDays / 36);
+
   // Calculate distances between squares and calendar
   const calculateSlideDistances = () => {
     if (calendarRef.current && squareRefs.current.length > 0) {
@@ -82,6 +87,17 @@ export default function TestPage({
     window.addEventListener("resize", calculateSlideDistances);
     return () => window.removeEventListener("resize", calculateSlideDistances);
   }, [currentColors]);
+
+  useEffect(() => {
+    if (totalDays > 0 && totalDays % 36 === 0 && currentBlock < totalBlocks) {
+      setShowBlockModal(true);
+    }
+  }, [totalDays]);
+
+  const handleBlockContinue = () => {
+    setShowBlockModal(false);
+    setCurrentBlock((prev) => prev + 1);
+  };
 
   const handleAdvanceDay = () => {
     setCurrentDay((prevDay) => {
@@ -294,8 +310,8 @@ export default function TestPage({
       }
     };
 
-    window.addEventListener("keydown", handleKeyPress);
-    return () => window.removeEventListener("keydown", handleKeyPress);
+    window.addEventListener("keyup", handleKeyPress);
+    return () => window.removeEventListener("keyup", handleKeyPress);
   }, [
     currentColors,
     isSliding,
@@ -315,99 +331,111 @@ export default function TestPage({
 
   return (
     <div
-      className="flex flex-row h-screen"
+      className="flex flex-col h-screen"
       style={{ backgroundColor: "#595959" }}
     >
-      {showBlankScreen && (
-        <div className="absolute top-0 left-0 w-full h-full bg-[#595959] z-50" />
-      )}
-      <div className="basis-1/2 flex items-center justify-center text-7xl grid grid-rows-2">
-        <p className="text-center mb-[-200px]">
-          Buy <br className="mb-[30px]" /> <strong>{currentItem}</strong>
-        </p>
-        <div className="flex items-center justify-center relative mt-[-80px]">
-          <img
-            src={twoKeys}
-            alt="2Key Keyboard"
-            style={{ width: "60%", height: "60%", opacity: 0 }}
-            className="relative"
-          />
-          {currentColors.map((color, index) => {
-            let positionClass = "";
-            if (colors.length === 2) {
-              positionClass = index === 0 ? "left-1/4" : "right-1/4";
-            } else if (colors.length === 3) {
-              positionClass =
-                index === 0
-                  ? "left-1/4"
-                  : index === 1
-                  ? "left-1/5"
-                  : "right-1/4";
-            }
-
-            return (
-              <div
-                key={index}
-                ref={(el) => (squareRefs.current[index] = el)}
-                className={`absolute ${positionClass} w-24 h-24 transition-transform duration-200 ease-in-out color-square`}
-                style={{
-                  backgroundColor: color,
-                  borderRadius: "0.5rem",
-                }}
-              ></div>
-            );
-          })}
-        </div>
-      </div>
-      <div className="basis-1/2 flex items-center justify-center relative">
-        <img
-          ref={calendarRef}
-          src={Calendar2}
-          alt="Calendar"
-          className="w-[60%] h-[60%] z-0"
+      {showBlockModal && (
+        <BlockCompletionModal
+          currentBlock={currentBlock}
+          totalBlocks={totalBlocks}
+          onContinue={handleBlockContinue}
         />
-        <p className="absolute text-black text-5xl font-bold top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-28 z-10">
-          {months[currentMonthIndex].name}
-        </p>
-        <p className="absolute text-black text-8xl font-bold top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-2 z-10">
-          {currentDay}
-        </p>
-
-        {showRedLine && (
-          <div className="absolute left-1/2 transform -translate-x-1/2 top-[65%] w-1/2 h-16 overflow-hidden">
-            <div
-              className="h-full bg-blue-500 animate-scroll-line"
-              style={{
-                backgroundColor: currentColors[0],
-                transform: "translateX(0.6rem)",
-              }}
-            />
-          </div>
+      )}
+      <div
+        className="flex flex-row h-screen"
+        style={{ backgroundColor: "#595959" }}
+      >
+        {showBlankScreen && (
+          <div className="absolute top-0 left-0 w-full h-full bg-[#595959] z-50" />
         )}
-
-        {showYellowLine && (
-          <div className="absolute left-1/2 transform -translate-x-1/2 top-[65%] w-1/2 h-16 overflow-hidden">
-            <div
-              className="h-full bg-blue-500 animate-scroll-line"
-              style={{
-                backgroundColor: currentColors[1],
-                transform: "translateX(0.6rem)",
-              }}
+        <div className="basis-1/2 flex items-center justify-center text-7xl grid grid-rows-2">
+          <p className="text-center mb-[-200px]">
+            Buy <br className="mb-[30px]" /> <strong>{currentItem}</strong>
+          </p>
+          <div className="flex items-center justify-center relative mt-[-80px]">
+            <img
+              src={twoKeys}
+              alt="2Key Keyboard"
+              style={{ width: "60%", height: "60%", opacity: 0 }}
+              className="relative"
             />
-          </div>
-        )}
+            {currentColors.map((color, index) => {
+              let positionClass = "";
+              if (colors.length === 2) {
+                positionClass = index === 0 ? "left-1/4" : "right-1/4";
+              } else if (colors.length === 3) {
+                positionClass =
+                  index === 0
+                    ? "left-1/4"
+                    : index === 1
+                    ? "left-1/5"
+                    : "right-1/4";
+              }
 
-        {showBlueLine && (
-          <div className="absolute left-1/2 transform -translate-x-1/2 top-[65%] w-1/2 h-16 overflow-hidden">
-            <div
-              className="h-full bg-blue-500 animate-scroll-line"
-              style={{
-                backgroundColor: currentColors[2],
-                transform: "translateX(0.6rem)",
-              }}
-            />
+              return (
+                <div
+                  key={index}
+                  ref={(el) => (squareRefs.current[index] = el)}
+                  className={`absolute ${positionClass} w-24 h-24 transition-transform duration-200 ease-in-out color-square`}
+                  style={{
+                    backgroundColor: color,
+                    borderRadius: "0.5rem",
+                  }}
+                ></div>
+              );
+            })}
           </div>
-        )}
+        </div>
+        <div className="basis-1/2 flex items-center justify-center relative">
+          <img
+            ref={calendarRef}
+            src={Calendar2}
+            alt="Calendar"
+            className="w-[60%] h-[60%] z-0"
+          />
+          <p className="absolute text-black text-5xl font-bold top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-28 z-10">
+            {months[currentMonthIndex].name}
+          </p>
+          <p className="absolute text-black text-8xl font-bold top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-2 z-10">
+            {currentDay}
+          </p>
+
+          {showRedLine && (
+            <div className="absolute left-1/2 transform -translate-x-1/2 top-[65%] w-1/2 h-16 overflow-hidden">
+              <div
+                className="h-full bg-blue-500 animate-scroll-line"
+                style={{
+                  backgroundColor: currentColors[0],
+                  transform: "translateX(0.6rem)",
+                }}
+              />
+            </div>
+          )}
+
+          {showYellowLine && (
+            <div className="absolute left-1/2 transform -translate-x-1/2 top-[65%] w-1/2 h-16 overflow-hidden">
+              <div
+                className="h-full bg-blue-500 animate-scroll-line"
+                style={{
+                  backgroundColor: currentColors[1],
+                  transform: "translateX(0.6rem)",
+                }}
+              />
+            </div>
+          )}
+
+          {showBlueLine && (
+            <div className="absolute left-1/2 transform -translate-x-1/2 top-[65%] w-1/2 h-16 overflow-hidden">
+              <div
+                className="h-full bg-blue-500 animate-scroll-line"
+                style={{
+                  backgroundColor: currentColors[2],
+                  transform: "translateX(0.6rem)",
+                }}
+              />
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
