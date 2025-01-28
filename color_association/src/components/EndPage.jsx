@@ -148,13 +148,30 @@ export default function EndPage() {
         </>
       ) : (
         <>
-          <p className="w-1/2 text-left text-xl">
+          <h3 className="w-2/3 text-left text-xl">Debrief:</h3>
+          <p className="w-2/3 text-left text-xl">
             Thank you for participating in this study. You were assigned to a
             specific training and testing condition as part of our research.
             Please note that other participants may have been assigned to
             different lengths of training and testing. These variations are a
             crucial aspect of our study design and help us explore how different
             training durations affect performance and outcomes.
+          </p>
+          <h3 className="w-2/3 text-left text-xl">Study Purpose</h3>
+          <p className="w-2/3 text-left text-xl">
+            Color has long been a tool for visual categorization (e.g., red on a
+            calendar may be for “class” and blue may be “work”). Most research
+            related to color mapping has been done on static systems, yet
+            dynamic systems are more common in real life (e.g., if you need to
+            add the new category of “athletics”). The present study aims to
+            investigate how to best navigate such dynamic systems, when new
+            colors and categories are added and color-category mappings are
+            changed.{" "}
+          </p>
+          <p className="w-2/3 text-left text-xl">
+            If you have any questions or would like more information about the
+            study, please feel free to contact Rainy Jin at jin252@wisc.edu.
+            Your participation is greatly appreciated!
           </p>
           <button
             className="px-4 py-2 bg-green-500 text-white rounded"
