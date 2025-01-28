@@ -1,6 +1,11 @@
 import React from "react";
 
-const BlockCompletionModal = ({ currentBlock, totalBlocks, onContinue }) => {
+const BlockCompletionModal = ({
+  currentBlock,
+  totalBlocks,
+  onContinue,
+  accuracy,
+}) => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100]">
       <div className="bg-white p-8 rounded-lg shadow-xl text-center">
@@ -8,6 +13,7 @@ const BlockCompletionModal = ({ currentBlock, totalBlocks, onContinue }) => {
         <p className="text-lg mb-6">
           You have completed {currentBlock}/{totalBlocks} blocks
         </p>
+        <p className="text-lg mb-6">Total Accuracy: {accuracy.toFixed(1)}%</p>
         <button
           onClick={onContinue}
           className="px-6 py-3 bg-blue-500 text-white rounded hover:bg-blue-600"

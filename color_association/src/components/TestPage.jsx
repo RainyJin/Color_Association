@@ -81,6 +81,25 @@ export default function TestPage({
     }
   };
 
+  const calculateBlockAccuracy = () => {
+    const startIndex = (currentBlock - 1) * 36;
+    const endIndex = startIndex + 36;
+
+    const responses = JSON.parse(
+      localStorage.getItem(
+        isTrainingPhase ? "trainingResponses" : "testingResponses"
+      )
+    );
+
+    const blockResponses = responses.slice(startIndex, endIndex);
+    const correctCount = blockResponses.filter(
+      (response) => response?.isCorrect
+    ).length;
+    const accuracy = (correctCount / blockResponses.length) * 100;
+
+    return accuracy;
+  };
+
   // Recalculate distances on window resize
   useEffect(() => {
     calculateSlideDistances();
@@ -339,6 +358,7 @@ export default function TestPage({
           currentBlock={currentBlock}
           totalBlocks={totalBlocks}
           onContinue={handleBlockContinue}
+          accuracy={calculateBlockAccuracy()}
         />
       )}
       <div
