@@ -98,10 +98,13 @@ export default function InitialInstructionPage({ onParticipantIdSubmit }) {
           (e.g., Buy Apple or Buy Banana). Below the name of the grocery item,
           you will see two colored squares (e.g., one red and one green). Your
           job is to indicate which of the two colors represents the item to be
-          bought as quickly as possible. Press 'A' if you think it should be the
-          left colored square and 'D' if you think it should be the right
-          colored square. Don’t press so quickly that you make mistakes, but
-          press as fast as you can without making mistakes.
+          bought as quickly as possible. Press the key on the far left if you
+          think it should be the left colored square and the key on the far
+          right if you think it should be the right colored square.
+          <br />
+          Please look at the text and the colors before making any inputs. And
+          please don't press any buttons immediately even if you've pressed the
+          wrong button, wait for the next day to load before making a choice.
           <br />
           <br />
           You will start with just two possible items to buy and two colors.

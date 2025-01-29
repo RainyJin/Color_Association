@@ -20,15 +20,23 @@ export default function SpecificInstructionsPage({ trial }) {
       {Object.keys(trial).length === 3 ? (
         <div className="flex flex-col items-center justify-center">
           <p className="flex items-center text-xl">
-            Press 'A' if you think it should be the left colored square and 'D'
-            if you think it should be the right.{" "}
+            Press the key on the far left if you think it should be the left
+            colored square and the key on the far right if you think it should
+            be the right.{" "}
           </p>
           <p className="flex items-center text-xl">
-            Press 'S' if you think it should be the middle colored square.
+            Press the key in the middle if you think it should be the middle
+            colored square.
           </p>
         </div>
       ) : (
-        <></>
+        <div className="flex flex-col items-center justify-center">
+          <p className="flex items-center text-xl">
+            Press the key on the far left if you think it should be the left
+            colored square and the key on the far right if you think it should
+            be the right.{" "}
+          </p>
+        </div>
       )}
       <p className="flex items-center text-xl">
         For the current set of calendar days, you will be seeing the following

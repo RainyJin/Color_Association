@@ -39,7 +39,7 @@ export default function TestPage({
   const [startTime, setStartTime] = useState(0);
   const [isTrialReady, setIsTrialReady] = useState(false);
   const [currentTrialIndex, setCurrentTrialIndex] = useState(startDay);
-  const [canPress, setCanPress] = useState(true);
+  const canPressRef = useRef(true);
 
   const navigate = useNavigate();
 
@@ -169,10 +169,11 @@ export default function TestPage({
 
   useEffect(() => {
     const handleKeyPress = (event) => {
-      if (!isTrialReady || isSliding) return;
+      if (!isTrialReady || !canPressRef.current || isSliding) {
+        return;
+      }
 
-      setCanPress(false);
-      setTimeout(() => setCanPress(true), 1000); // 1 second cooldown
+      canPressRef.current = false;
 
       let selectedIndex = null;
       let color = "";
@@ -224,14 +225,12 @@ export default function TestPage({
         }
 
         if (!isCorrect) {
-          // Play sound effect and show shake animation for incorrect selection
           soundEffect.currentTime = 0;
           soundEffect.play();
 
           const selectedElement = squareRefs.current[selectedIndex];
           selectedElement.classList.add("animate-shake");
 
-          // Find correct color and animate after shake
           const correctIndex = currentColors.findIndex(
             (c) => c === correctCombo[currentItem]
           );
@@ -242,18 +241,15 @@ export default function TestPage({
 
             if (correctElement) {
               setIsSliding(true);
-              // Ensure full slide for incorrect selections
               correctElement.style.transform = `translateX(${
                 slideDistances[correctIndex] + 70
               }px)`;
 
-              // Show line for correct color
               setShowRedLine(correctIndex === 0);
               setShowYellowLine(correctIndex === 1);
               setShowBlueLine(correctIndex === 2);
             }
 
-            // Complete trial after animations
             setTimeout(() => {
               squareRefs.current.forEach((ref) => {
                 if (ref) ref.style.transform = "translateX(0)";
@@ -279,6 +275,7 @@ export default function TestPage({
                 setShowYellowLine(false);
                 setShowBlueLine(false);
                 setShowBlankScreen(false);
+                canPressRef.current = true;
               }, 100);
             }, 800);
           }, 500);
@@ -323,6 +320,7 @@ export default function TestPage({
               setShowYellowLine(false);
               setShowBlueLine(false);
               setShowBlankScreen(false);
+              canPressRef.current = true;
             }, 100);
           }, 800);
         }
