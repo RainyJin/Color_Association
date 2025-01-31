@@ -47,9 +47,9 @@ export default function EndPage() {
 
     // Map trial data to rows and add demographic info at the beginning of each row
     const csvRows = trialData.map((entry) => {
-      return `${age},${gender},${ethnicity},${entry.trialType},${entry.day}"${
+      return `${age},${gender},${ethnicity},${entry.trialType},${entry.day},${
         entry.displayedColorText
-      }","${entry.shuffledColors.join(";")}",${entry.selectedColor},${
+      },"${entry.shuffledColors.join(";")}",${entry.selectedColor},${
         entry.isCorrect
       },${entry.reactionTime},${entry.timestamp}`;
     });

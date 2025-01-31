@@ -116,6 +116,7 @@ export default function TestPage({
   const handleBlockContinue = () => {
     setShowBlockModal(false);
     setCurrentBlock((prev) => prev + 1);
+    setStartTime(Date.now());
   };
 
   const handleAdvanceDay = () => {
