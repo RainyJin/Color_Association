@@ -18,7 +18,7 @@ const BlockCompletionModal = ({
             Block Accuracy: {metrics.accuracy.toFixed(1)}%
           </p>
           <p className="text-lg">
-            Average Reaction Time: {metrics.averageReactionTime.toFixed(0)}ms
+            Average Time: {metrics.averageReactionTime.toFixed(0)}ms
           </p>
         </div>
         <button
