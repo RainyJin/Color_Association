@@ -81,7 +81,7 @@ export default function TestPage({
     }
   };
 
-  const calculateBlockAccuracy = () => {
+  const calculateBlockMetrics = () => {
     const startIndex = (currentBlock - 1) * 36;
     const endIndex = startIndex + 36;
 
@@ -92,12 +92,27 @@ export default function TestPage({
     );
 
     const blockResponses = responses.slice(startIndex, endIndex);
+
+    // Calculate accuracy
     const correctCount = blockResponses.filter(
       (response) => response?.isCorrect
     ).length;
     const accuracy = (correctCount / blockResponses.length) * 100;
 
-    return accuracy;
+    // Calculate average reaction time
+    const validReactionTimes = blockResponses
+      .filter((response) => response?.reactionTime)
+      .map((response) => response.reactionTime);
+
+    const averageReactionTime = validReactionTimes.length
+      ? validReactionTimes.reduce((sum, time) => sum + time, 0) /
+        validReactionTimes.length
+      : 0;
+
+    return {
+      accuracy,
+      averageReactionTime,
+    };
   };
 
   // Recalculate distances on window resize
@@ -357,7 +372,7 @@ export default function TestPage({
           currentBlock={currentBlock}
           totalBlocks={totalBlocks}
           onContinue={handleBlockContinue}
-          accuracy={calculateBlockAccuracy()}
+          metrics={calculateBlockMetrics()}
         />
       )}
       <div

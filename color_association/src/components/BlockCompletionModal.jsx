@@ -4,7 +4,7 @@ const BlockCompletionModal = ({
   currentBlock,
   totalBlocks,
   onContinue,
-  accuracy,
+  metrics,
 }) => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100]">
@@ -13,7 +13,14 @@ const BlockCompletionModal = ({
         <p className="text-lg mb-6">
           You have completed {currentBlock}/{totalBlocks} blocks
         </p>
-        <p className="text-lg mb-6">Total Accuracy: {accuracy.toFixed(1)}%</p>
+        <div className="space-y-4 mb-6">
+          <p className="text-lg">
+            Block Accuracy: {metrics.accuracy.toFixed(1)}%
+          </p>
+          <p className="text-lg">
+            Average Reaction Time: {metrics.averageReactionTime.toFixed(0)}ms
+          </p>
+        </div>
         <button
           onClick={onContinue}
           className="px-6 py-3 bg-blue-500 text-white rounded hover:bg-blue-600"
