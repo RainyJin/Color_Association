@@ -130,44 +130,85 @@ function generateTrialSets(isShortTraining, currentTrial) {
 
 function App() {
   const navigate = useNavigate();
+  // Part 1 Calendar with apple, banana, cherry and celery
+  // const trials = [
+  //   // #1 remap assigned to remap
+  //   {
+  //     twoColorMapping: { apple: "#5E2B3A", banana: "#FCDB42" },
+  //     threeColorMapping: {
+  //       apple: "#0E8A19",
+  //       banana: "#FCDB42",
+  //       cherry: "#5E2B3A",
+  //     },
+  //   },
+  //   // #2 remap assigned to fold-in
+  //   {
+  //     twoColorMapping: { apple: "#5E2B3A", banana: "#FCDB42" },
+  //     threeColorMapping: {
+  //       apple: "#5E2B3A",
+  //       banana: "#FCDB42",
+  //       cherry: "#0E8A19",
+  //     },
+  //   },
+  //   // #3 fold-in assigned to fold-in
+  //   {
+  //     twoColorMapping: { apple: "#5E2B3A", banana: "#FCDB42" },
+  //     threeColorMapping: {
+  //       apple: "#5E2B3A",
+  //       banana: "#FCDB42",
+  //       celery: "#0E8A19",
+  //     },
+  //   },
+  //   // #4 fold-in assigned to remap
+  //   {
+  //     twoColorMapping: { apple: "#5E2B3A", banana: "#FCDB42" },
+  //     threeColorMapping: {
+  //       apple: "#0E8A19",
+  //       banana: "#FCDB42",
+  //       celery: "#5E2B3A",
+  //     },
+  //   },
+  // ];
+  // Part 2 Calendar with carrot, blueberry, strawberry, lemon
   const trials = [
     // #1 remap assigned to remap
     {
-      twoColorMapping: { apple: "#5E2B3A", banana: "#FCDB42" },
+      twoColorMapping: { carrot: "#FBA714", blueberry: "#2E3086" },
       threeColorMapping: {
-        apple: "#0E8A19",
-        banana: "#FCDB42",
-        cherry: "#5E2B3A",
+        carrot: "#CC4F1B",
+        blueberry: "#2E3086",
+        lemon: "#FBA714",
       },
     },
     // #2 remap assigned to fold-in
     {
-      twoColorMapping: { apple: "#5E2B3A", banana: "#FCDB42" },
+      twoColorMapping: { carrot: "#FBA714", blueberry: "#2E3086" },
       threeColorMapping: {
-        apple: "#5E2B3A",
-        banana: "#FCDB42",
-        cherry: "#0E8A19",
+        carrot: "#FBA714",
+        blueberry: "#2E3086",
+        lemon: "#CC4F1B",
       },
     },
     // #3 fold-in assigned to fold-in
     {
-      twoColorMapping: { apple: "#5E2B3A", banana: "#FCDB42" },
+      twoColorMapping: { carrot: "#FBA714", blueberry: "#2E3086" },
       threeColorMapping: {
-        apple: "#5E2B3A",
-        banana: "#FCDB42",
-        celery: "#0E8A19",
+        carrot: "#FBA714",
+        blueberry: "#2E3086",
+        strawberry: "#CC4F1B",
       },
     },
     // #4 fold-in assigned to remap
     {
-      twoColorMapping: { apple: "#5E2B3A", banana: "#FCDB42" },
+      twoColorMapping: { carrot: "#FBA714", blueberry: "#2E3086" },
       threeColorMapping: {
-        apple: "#0E8A19",
-        banana: "#FCDB42",
-        celery: "#5E2B3A",
+        carrot: "#CC4F1B",
+        blueberry: "#2E3086",
+        strawberry: "#FBA714",
       },
     },
   ];
+
   const [isShortTraining, setIsShortTraining] = useState(true);
   const [currentTrial, setCurrentTrial] = useState(null);
   const [trialSets, setTrialSets] = useState({
