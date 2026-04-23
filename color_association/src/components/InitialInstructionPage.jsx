@@ -94,10 +94,10 @@ export default function InitialInstructionPage({ onParticipantIdSubmit }) {
         <h1 className="text-3xl font-bold mb-6">Instructions</h1>
         <p className="text-xl text-left w-3/5 mx-auto mb-4">
           In the following tasks, you are going to see a series of days from a
-          calendar. On each day, you will be instructed to buy a grocery item
-          (e.g., Buy Apple or Buy Banana). Below the name of the grocery item,
-          you will see two colored squares (e.g., one red and one green). Your
-          job is to indicate which of the two colors represents the item to be
+          calendar. On each day, you will be instructed to identify the emotion/value of the day
+          (e.g., Feeling Sad or Feeling Love). Below the name of the emotion,
+          you will see two colored squares (e.g., one red and one blue). Your
+          job is to indicate which of the two colors represents the emotion/value to be
           bought as quickly as possible. Press the key on the far left if you
           think it should be the left colored square and the key on the far
           right if you think it should be the right colored square.
@@ -107,14 +107,14 @@ export default function InitialInstructionPage({ onParticipantIdSubmit }) {
           wrong button, wait for the next day to load before making a choice.
           <br />
           <br />
-          You will start with just two possible items to buy and two colors.
+          You will start with just two possible emotions/values and two colors.
           After completing some number of days with those two items and colors,
           a third item and color will be added. Your overall task will be the
           same though, press the key corresponding to the color that goes with
-          the to-be-bought item for the day.
+          emotion/value for the day.
         </p>
         <p className="text-xl text-left w-3/5 mx-auto mb-4">
-          Press the Next button to see the to-be-bought items and associated
+          Press the Next button to see the emotion/value and associated
           colors for the first set of calendar days.{" "}
         </p>
         <button
