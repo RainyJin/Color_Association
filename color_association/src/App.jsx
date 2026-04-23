@@ -170,41 +170,81 @@ function App() {
   //   },
   // ];
   // Part 2 Calendar with carrot, blueberry, strawberry, lemon
-  const trials = [
+  // const trials = [
+  //   // #1 remap assigned to remap
+  //   {
+  //     twoColorMapping: { carrot: "#FBA714", blueberry: "#2E3086" },
+  //     threeColorMapping: {
+  //       carrot: "#CC4F1B",
+  //       blueberry: "#2E3086",
+  //       lemon: "#FBA714",
+  //     },
+  //   },
+  //   // #2 remap assigned to fold-in
+  //   {
+  //     twoColorMapping: { carrot: "#FBA714", blueberry: "#2E3086" },
+  //     threeColorMapping: {
+  //       carrot: "#FBA714",
+  //       blueberry: "#2E3086",
+  //       lemon: "#CC4F1B",
+  //     },
+  //   },
+  //   // #3 fold-in assigned to fold-in
+  //   {
+  //     twoColorMapping: { carrot: "#FBA714", blueberry: "#2E3086" },
+  //     threeColorMapping: {
+  //       carrot: "#FBA714",
+  //       blueberry: "#2E3086",
+  //       strawberry: "#CC4F1B",
+  //     },
+  //   },
+  //   // #4 fold-in assigned to remap
+  //   {
+  //     twoColorMapping: { carrot: "#FBA714", blueberry: "#2E3086" },
+  //     threeColorMapping: {
+  //       carrot: "#CC4F1B",
+  //       blueberry: "#2E3086",
+  //       strawberry: "#FBA714",
+  //     },
+  //   },
+  // ];
+
+// Calendar with sad, love, disgust and peace
+const trials = [
     // #1 remap assigned to remap
     {
-      twoColorMapping: { carrot: "#FBA714", blueberry: "#2E3086" },
+      twoColorMapping: { sad: "#1C3D61", love: "#EA1D1D" },
       threeColorMapping: {
-        carrot: "#CC4F1B",
-        blueberry: "#2E3086",
-        lemon: "#FBA714",
+        sad: "#443B14",
+        love: "#EA1D1D",
+        peace: "#1C3D61",
       },
     },
     // #2 remap assigned to fold-in
     {
-      twoColorMapping: { carrot: "#FBA714", blueberry: "#2E3086" },
+      twoColorMapping: { sad: "#1C3D61", love: "#EA1D1D" },
       threeColorMapping: {
-        carrot: "#FBA714",
-        blueberry: "#2E3086",
-        lemon: "#CC4F1B",
+        sad: "#1C3D61",
+        love: "#EA1D1D",
+        peace: "#443B14",
       },
     },
     // #3 fold-in assigned to fold-in
     {
-      twoColorMapping: { carrot: "#FBA714", blueberry: "#2E3086" },
+      twoColorMapping: { sad: "#1C3D61", love: "#EA1D1D" },
       threeColorMapping: {
-        carrot: "#FBA714",
-        blueberry: "#2E3086",
-        strawberry: "#CC4F1B",
+        sad: "#1C3D61",
+        love: "#EA1D1D",
+        disgust: "#443B14",
       },
     },
     // #4 fold-in assigned to remap
     {
-      twoColorMapping: { carrot: "#FBA714", blueberry: "#2E3086" },
+      twoColorMapping: { sad: "#1C3D61", love: "#EA1D1D" },
       threeColorMapping: {
-        carrot: "#CC4F1B",
-        blueberry: "#2E3086",
-        strawberry: "#FBA714",
+        sad: "#443B14",
+        love: "#EA1D1D",
+        disgust: "#1C3D61",
       },
     },
   ];
