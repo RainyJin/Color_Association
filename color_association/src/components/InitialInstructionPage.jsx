@@ -97,8 +97,7 @@ export default function InitialInstructionPage({ onParticipantIdSubmit }) {
           calendar. On each day, you will be instructed to identify the emotion/value of the day
           (e.g., Feeling Sad or Feeling Love). Below the name of the emotion,
           you will see two colored squares (e.g., one red and one blue). Your
-          job is to indicate which of the two colors represents the emotion/value to be
-          bought as quickly as possible. Press the key on the far left if you
+          job is to indicate which of the two colors represents the emotion/value as quickly as possible. Press the key on the far left if you
           think it should be the left colored square and the key on the far
           right if you think it should be the right colored square.
           <br />
