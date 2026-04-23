@@ -384,7 +384,7 @@ export default function TestPage({
         )}
         <div className="basis-1/2 flex items-center justify-center text-7xl grid grid-rows-2">
           <p className="text-center mb-[-200px]">
-            Buy <br className="mb-[30px]" /> <strong>{currentItem}</strong>
+            Feeling <br className="mb-[30px]" /> <strong>{currentItem}</strong>
           </p>
           <div className="flex items-center justify-center relative mt-[-80px]">
             <img

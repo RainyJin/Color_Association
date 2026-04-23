@@ -40,7 +40,7 @@ export default function SpecificInstructionsPage({ trial }) {
       )}
       <p className="flex items-center text-xl">
         For the current set of calendar days, you will be seeing the following
-        items to buy:
+        emotions/values:
       </p>
       <div className="flex flex-col items-center">
         <p className="text-xl">{Object.keys(trial).join(" & ")}</p>
